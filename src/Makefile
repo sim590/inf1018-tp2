@@ -16,3 +16,5 @@ syntaxique.o: syntaxique.c syntaxique.h
 	gcc $(DEBUG) -c syntaxique.c
 lexical.o: lexical.c lexical.h
 	gcc $(DEBUG) -c lexical.c
+clean:
+	rm -rf *.o
