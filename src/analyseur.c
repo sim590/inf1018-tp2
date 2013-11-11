@@ -1,4 +1,4 @@
-#include "lexical.c"
+#include "lexical.h"
 
 int main(int argc, char *argv[])
 {
