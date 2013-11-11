@@ -6,10 +6,11 @@
 # Makefile pour le projet inf1018 - tp2 
 #--------------------------------------------------------
 
+BINDIR=../bin
 DEBUG=-g
 
 all: analyseur.o syntaxique.o lexical.o
-	gcc -o inf1018tp2 analyseur.o syntaxique.o lexical.o
+	gcc -o $(BINDIR)/inf1018tp2 analyseur.o syntaxique.o lexical.o
 analyseur.o: analyseur.c
 	gcc $(DEBUG) -c analyseur.c
 syntaxique.o: syntaxique.c syntaxique.h
