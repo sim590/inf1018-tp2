@@ -1,6 +1,12 @@
+//-------------------------------------------------------
+// File: lexical.c    Author(s): Simon Désaulniers
+//                               Frédéric Hamelin
+// Date: 2013-11-11
+//-------------------------------------------------------
+// Gestion des tâches lexicales de l'analyseur
+//-------------------------------------------------------
 #include "lexical.h"
 
-char *buffer;
 
 void loadFile(char *filename)
 {
@@ -37,7 +43,8 @@ char * next()
             if (strLength != 0)
                 return getLastCharacters(strLength);
         }
-        else if (*buffer == '+' || *buffer == '-' || *buffer == '*' || *buffer == '/' || *buffer == ':' || *buffer == ';' || *buffer == '(' || *buffer == ')') {
+        else if (*buffer == '+' || *buffer == '-' || *buffer == '*' || *buffer == '/' 
+                    || *buffer == ':' || *buffer == ';' || *buffer == '(' || *buffer == ')') {
            if (strLength == 0) {
                 char * token = malloc(sizeof(char) * 2);
 
