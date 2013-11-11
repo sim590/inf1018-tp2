@@ -23,7 +23,6 @@ void loadFile(char *filename)
           fclose(fp),free(buffer),fputs("entire read fails",stderr),exit(1);
 
     /* do your work here, buffer is a string contains the whole text */
-    printf("%s", buffer);
     fclose(fp);
     free(buffer);
 }
@@ -36,6 +35,8 @@ char * next()
         if ((*buffer == ' ' || *buffer == '\n' || *buffer == '\t' )) {
             if (strLength != 0)
                 return getLastCharacters(strLength);
+            else
+                buffer++;
         }
         else if (*buffer == '+' || *buffer == '-' || *buffer == '*' || *buffer == '/' || *buffer == ':' || *buffer == ';' || *buffer == '(' || *buffer == ')') {
            if (strLength == 0) {
@@ -59,6 +60,7 @@ char * next()
             buffer++;
         }
     }
+    return "";
 }
 
 char * getLastCharacters(int strLength)
