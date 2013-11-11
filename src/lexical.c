@@ -27,3 +27,58 @@ void loadFile(char *filename)
     fclose(fp);
     free(buffer);
 }
+
+char * next()
+{
+    int strLength = 0;
+
+    while(*buffer != '\0') {
+        if ((*buffer == ' ' || *buffer == '\n' || *buffer == '\t' )) {
+            if (strLength != 0)
+                return getLastCharacters(strLength);
+        }
+        else if (*buffer == '+' || *buffer == '-' || *buffer == '*' || *buffer == '/' || *buffer == ':' || *buffer == ';' || *buffer == '(' || *buffer == ')') {
+           if (strLength == 0) {
+                char * token = malloc(sizeof(char) * 2);
+
+                *token = *buffer;
+
+                buffer++;
+                token++;
+
+                *token = '\0';
+
+                return token;
+           }
+           else {
+                return getLastCharacters(strLength);
+           } 
+        }
+        else {
+            strLength++;
+            buffer++;
+        }
+    }
+}
+
+char * getLastCharacters(int strLength)
+{
+    char * token = malloc(sizeof(char) * (strLength + 1));
+
+    buffer -= strLength;
+
+    int index = 0;
+
+    while (index < strLength) {
+        *token = *buffer;
+        buffer++;
+        token++;
+        index++;
+    }
+
+    *token = '\0';
+
+    token -= strLength;
+
+    return token;
+}
