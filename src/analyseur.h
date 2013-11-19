@@ -8,6 +8,8 @@
 #ifndef ANALYSEUR_4BB0V0UD
 
 #define ANALYSEUR_4BB0V0UD
+#include <lexical.h>
+#include <syntaxique.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

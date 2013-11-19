@@ -5,7 +5,6 @@
 //-------------------------------------------------------
 // Fichier principale du projet inf1018-tp2
 //-------------------------------------------------------
-#include "lexical.h"
 #include <analyseur.h>
 
 void loadFile(char **buffer, char *filename)

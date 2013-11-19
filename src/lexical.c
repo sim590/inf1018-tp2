@@ -16,6 +16,8 @@ char * next()
         if ((*buffer == ' ' || *buffer == '\n' || *buffer == '\t' )) {
             if (strLength != 0)
                 return getLastCharacters(strLength);
+            else
+                buffer++;
         }
         else if (*buffer == '+' || *buffer == '-' || *buffer == '*' || *buffer == '/' 
                     || *buffer == ':' || *buffer == ';' || *buffer == '(' || *buffer == ')') {
@@ -29,6 +31,7 @@ char * next()
 
                 *token = '\0';
 
+                lastTokenSize = 1;
                 return token;
            }
            else {
@@ -40,6 +43,18 @@ char * next()
             buffer++;
         }
     }
+
+    lastTokenSize = 0;
+    return "";
+}
+
+char * last()
+{
+    char * token = getLastCharacters(lastTokenSize);
+
+    buffer -= lastTokenSize;
+
+    return token;
 }
 
 char * getLastCharacters(int strLength)
@@ -61,5 +76,6 @@ char * getLastCharacters(int strLength)
 
     token -= strLength;
 
+    lastTokenSize = strLength;
     return token;
 }

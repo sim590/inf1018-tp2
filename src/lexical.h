@@ -10,6 +10,7 @@
 #define LEXICAL_4UGTM7YE
 #include <analyseur.h>
 
+int lastTokenSize;
 //------------
 //Fonctions 
 //------------
@@ -20,6 +21,13 @@
 //  char*: le prochain token à analyser.
 //----------------------------------------
 char * next();
+
+//----------------------------------------
+// last()
+// valeur de retour:
+//  char*: le token précédent.
+//----------------------------------------
+char * last();
 
 //----------------------
 // getLastCharacters()
