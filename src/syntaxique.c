@@ -19,11 +19,11 @@ int procedure()
         return 0;
     }
 
-    identificateur();
+    identificator();
 
     declarations();
 
-    instructions_affectation();
+    affectation_instructions();
 
     token = next();
 
@@ -33,7 +33,7 @@ int procedure()
         return 0;
     }
 
-    identificateur();
+    identificator();
 
     return 1;
 }
@@ -74,7 +74,7 @@ int declaration()
 
 int variable()
 {
-    return identificateur();
+    return identificator();
 }
 
 int type()
@@ -87,7 +87,7 @@ int type()
     }
 }
 
-int identificateur()
+int identificator()
 {
     token = next();
 
@@ -121,13 +121,13 @@ int identificateur()
     return 1;
 }
 
-int instructions_affectation()
+int affectation_instructions()
 {
-    instruction_affectation();
+    affectation_instruction();
 
     token = next();
     while (strcmp(token, ";") == 0) {
-        instruction_affectation();
+        affectation_instruction();
 
         token = next();
     }
@@ -137,7 +137,7 @@ int instructions_affectation()
     return 1;
 }
 
-int instruction_affectation()
+int affectation_instruction()
 {
     variable();
 
@@ -148,19 +148,19 @@ int instruction_affectation()
         return 0;
     }
 
-    expression_arithmetique();
+    arithmetic_expression();
 
     return 1;
 }
 
-int expression_arithmetique()
+int arithmetic_expression()
 {
-    terme();
+    term();
 
     token = next();
 
     while (strcmp(token, "+") == 0 || strcmp(token, "-") == 0) {
-        terme();
+        term();
         token = next();
     }
 
@@ -169,13 +169,13 @@ int expression_arithmetique()
     return 1;
 }
 
-int terme()
+int term()
 {
-    facteur();
+    factor();
 
     token = next();
     while (strcmp(token, "*") == 0 || strcmp(token, "/") == 0) {
-        facteur();
+        factor();
         token = next();
     }
 
@@ -184,7 +184,7 @@ int terme()
     return 1;
 }
 
-int facteur()
+int factor()
 {
    if (variable() == 1) {
         return 1;
@@ -192,7 +192,7 @@ int facteur()
 
    token = last();
 
-   if (nombre() == 1) {
+   if (number() == 1) {
         return 1;
    }
 
@@ -201,7 +201,7 @@ int facteur()
        return 0;
    }
 
-   expression_arithmetique();
+   arithmetic_expression();
 
    token = next();
 
@@ -213,7 +213,7 @@ int facteur()
    return 1; 
 }
 
-int nombre()
+int number()
 {
     token = next();
     

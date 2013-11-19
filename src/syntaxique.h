@@ -16,14 +16,14 @@
 int procedure();
 int declarations();
 int declaration();
-int instructions_affectation();
-int instruction_affectation();
+int affectation_instructions();
+int affectation_instruction();
 int variable();
 int type();
-int identificateur();
-int expression_arithmetique();
-int terme();
-int facteur();
-int nombre();
+int identificator();
+int arithmetic_expression();
+int term();
+int factor();
+int number();
 
 #endif

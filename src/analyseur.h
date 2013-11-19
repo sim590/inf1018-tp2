@@ -23,7 +23,7 @@ SYNPOSYS : inf1018tp2 [OPTIONS] file\n\
 \tfile\n\
 \t\tLe fichier duquel tirer le texte à anlayser.\n\
 OPTIONS\n\
-\t-l|--lexems lexems_filename\
+\t-l|--lexems lexems_filename\n\
 \t\tIndique le fichier dans lequel prendre le lexique (par défaut: ./lexems)\n\
 \t-h|--help\n\
 \t\tAffiche un texte d\'aide\n"
