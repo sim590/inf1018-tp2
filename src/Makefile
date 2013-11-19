@@ -10,6 +10,7 @@ BINDIR=../bin
 DEBUG=-g
 
 all: analyseur.o syntaxique.o lexical.o
+	mkdir -p $(BINDIR)
 	gcc -o $(BINDIR)/inf1018tp2 analyseur.o syntaxique.o lexical.o
 analyseur.o: analyseur.c
 	gcc -I. $(DEBUG) -c analyseur.c
