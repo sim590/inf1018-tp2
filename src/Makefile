@@ -12,10 +12,10 @@ DEBUG=-g
 all: analyseur.o syntaxique.o lexical.o
 	gcc -o $(BINDIR)/inf1018tp2 analyseur.o syntaxique.o lexical.o
 analyseur.o: analyseur.c
-	gcc $(DEBUG) -c analyseur.c
+	gcc -I. $(DEBUG) -c analyseur.c
 syntaxique.o: syntaxique.c syntaxique.h
-	gcc $(DEBUG) -c syntaxique.c
+	gcc -I. $(DEBUG) -c syntaxique.c
 lexical.o: lexical.c lexical.h
-	gcc $(DEBUG) -c lexical.c
+	gcc -I. $(DEBUG) -c lexical.c
 clean:
 	rm -rf *.o

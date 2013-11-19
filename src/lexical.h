@@ -8,25 +8,11 @@
 #ifndef LEXICAL_4UGTM7YE
 
 #define LEXICAL_4UGTM7YE
-
-#include <stdio.h>
-#include <stdlib.h>
-
-//Variables
-char *buffer;
+#include <analyseur.h>
 
 //------------
 //Fonctions 
 //------------
-
-//----------------------------
-// loadFile()
-// valeur de retour:
-//  void
-// load le fichier et le met
-// dans le buffer
-//----------------------------
-void loadFile(char *filename);
 
 //----------------------------------------
 // next()
