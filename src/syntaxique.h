@@ -6,16 +6,17 @@
 #include <stdio.h>
 #include "lexical.h"
 
-void procedure();
-void declarations();
-void declaration();
-void instructions_affectation();
-void instruction_affectation();
-void variable();
-void type();
-void identificateur();
-void expression_arithmetique();
-void terme();
-void facteur();
+int procedure();
+int declarations();
+int declaration();
+int instructions_affectation();
+int instruction_affectation();
+int variable();
+int type();
+int identificateur();
+int expression_arithmetique();
+int terme();
+int facteur();
+int nombre();
 
 #endif

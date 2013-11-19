@@ -14,7 +14,7 @@
 
 //Variables
 char *buffer;
-
+int lastTokenSize;
 //------------
 //Fonctions 
 //------------
@@ -34,6 +34,13 @@ void loadFile(char *filename);
 //  char*: le prochain token à analyser.
 //----------------------------------------
 char * next();
+
+//----------------------------------------
+// last()
+// valeur de retour:
+//  char*: le token précédent.
+//----------------------------------------
+char * last();
 
 //----------------------
 // getLastCharacters()

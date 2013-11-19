@@ -2,14 +2,14 @@
 
 char * token;
 
-void procedure()
+int procedure()
 {
     token = next();
 
     if (strcmp(token, "Procedure") != 0)
     {
         //Erreur
-        return;
+        return 0;
     }
 
     identificateur();
@@ -23,23 +23,28 @@ void procedure()
     if (strcmp(token, "Fin_Procedure") != 0)
     {
         //Erreur
-        return;
+        return 0;
     }
 
     identificateur();
 
+    return 1;
 }
 
-void declarations()
+int declarations()
 {
     token = next();
 
     while (strcmp(token, "declare") == 0) {
         declaration();
     }
+
+    token = last();
+
+    return 1;
 }
 
-void declaration()
+int declaration()
 {
     variable();
 
@@ -47,39 +52,41 @@ void declaration()
 
     if (strcmp(token, ":") != 0) {
         //erreur
-        return;
+        return 0;
     }
 
     type();
 
     if (strcmp(token, ";") != 0) {
         //erreur
-        return;
+        return 0;
     }
+
+    return 1;
 }
 
-void variable()
+int variable()
 {
-    identificateur();
+    return identificateur();
 }
 
-void type()
+int type()
 {
     token = next();
 
     if (strcmp(token, "entier") != 0 && strcmp(token, "réel") != 0) {
         //erreur
-        return;
+        return 0;
     }
 }
 
-void identificateur()
+int identificateur()
 {
     token = next();
 
     if (sizeof(*token) > 8) {
         //erreur
-        return;
+        return 0;
     }
 
     int ascii;
@@ -88,7 +95,7 @@ void identificateur()
 
     if (ascii < 65 || (ascii > 90 && ascii < 97) || ascii > 122) {
         //erreur
-        return;
+        return 0;
     }
     
     token++;
@@ -98,10 +105,116 @@ void identificateur()
         ascii =(int)*token;
         if (ascii < 48 || (ascii > 57 && ascii < 65) || (ascii > 90 && ascii < 97) || ascii > 122) {
             //erreur
-            return;
+            return 0;
         }
 
         token++;
     }
 
+    return 1;
+}
+
+int instructions_affectation()
+{
+    instruction_affectation();
+
+    token = next();
+    while (strcmp(token, ";") == 0) {
+        instruction_affectation();
+
+        token = next();
+    }
+
+    token = last();
+
+    return 1;
+}
+
+int instruction_affectation()
+{
+    variable();
+
+    token = next();
+
+    if (strcmp(token, "=") != 0) {
+        //erreur
+        return 0;
+    }
+
+    expression_arithmetique();
+
+    return 1;
+}
+
+int expression_arithmetique()
+{
+    terme();
+
+    token = next();
+
+    while (strcmp(token, "+") == 0 || strcmp(token, "-") == 0) {
+        terme();
+        token = next();
+    }
+
+    token = last();
+
+    return 1;
+}
+
+int terme()
+{
+    facteur();
+
+    token = next();
+    while (strcmp(token, "*") == 0 || strcmp(token, "/") == 0) {
+        facteur();
+        token = next();
+    }
+
+    token = last();
+
+    return 1;
+}
+
+int facteur()
+{
+   if (variable() == 1) {
+        return 1;
+   }
+
+   token = last();
+
+   if (nombre() == 1) {
+        return 1;
+   }
+
+   if (strcmp(token, "(") != 0) {
+       //erreur 
+       return 0;
+   }
+
+   expression_arithmetique();
+
+   token = next();
+
+   if (strcmp(token, ")") != 0) {
+       //erreur 
+       return 0;
+   }
+
+   return 1; 
+}
+
+int nombre()
+{
+    token = next();
+    
+    float f;
+
+    if (sscanf(token, "%f", &f) == 0){
+        //erreur
+        return 0;
+    }
+    return 1;
 }
