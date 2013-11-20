@@ -7,8 +7,8 @@
 //-------------------------------------------------------
 #include "lexical.h"
 
-delims_n_token =  {'+', '-', '*', '/', ':', ';', '(', ')'};
-all_delims =  {' ', '\n', '\t','+', '-', '*', '/', ':', ';', '(', ')'};
+const char delims_n_token[] =  {'+', '-', '*', '/', ':', ';', '(', ')'};
+const char all_delims[] =  {' ', '\n', '\t','+', '-', '*', '/', ':', ';', '(', ')'};
 
 int next(char **token)
 {
@@ -26,11 +26,11 @@ int next(char **token)
     //pointeur initial
     static const char *INIT_POS = cur_pos;
 
-    while (in(all_delims, *(MAIN_BUFFER+cur_pos-INIT_POS))) {
+    while (in(all_delims, *(MAIN_BUFFER+cur_pos-INIT_POS)) == 1) {
         cur_pos++;
         
         // si le token est un délimiteur
-        if (in(delims_n_token, *(MAIN_BUFFER+cur_pos-INIT_POS-1))) {
+        if (in(delims_n_token, *(MAIN_BUFFER+cur_pos-INIT_POS-1)) == 1) {
             sprintf(*token, "%c\0", *(MAIN_BUFFER+cur_pos-INIT_POS-1));
             return 0;
         }
@@ -58,12 +58,13 @@ int next(char **token)
     return 0;
 }
 
-bool in(char delims[], char token)
+int in(char delims[], char token)
 {
+    int i;
     for (i = 0; i < strlen(delims); i++) {
         if (token == delims[i]) {
-            return true;
+            return 1;
         }
     }
-    return false;
+    return 0;
 }

@@ -7,7 +7,7 @@
 //-------------------------------------------------------
 #include "syntaxique.h"
 
-char * token = malloc(sizeof(char) * 16);
+char * token;
 
 int askForNext()
 {
@@ -24,6 +24,7 @@ int askForNext()
 
 int procedure()
 {
+    token = malloc(sizeof(char) * 16);
     askForNext();
 
     if (strcmp(token, "Procedure") != 0)
