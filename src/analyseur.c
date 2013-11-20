@@ -76,8 +76,11 @@ int main(int argc, char *argv[])
     // lecture des options et arguments nécessaires
     if (getOptions(argc, argv))
         exit(EXIT_FAILURE);
+    
     // mise en tampon du fichier de test
-    loadFile(&buffer, input_filename); 
+    loadFile(&MAIN_BUFFER, input_filename); 
+    BUFLEN = strlen(MAIN_BUFFER);
+
     // mise en tampon du lexique
     loadFile(&lexems, lexems_filename);
 

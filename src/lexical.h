@@ -8,34 +8,23 @@
 #ifndef LEXICAL_4UGTM7YE
 
 #define LEXICAL_4UGTM7YE
+
+
 #include <analyseur.h>
 
-int lastTokenSize;
-//------------
-//Fonctions 
-//------------
+const char delims[], delims_n_token[];
 
 //----------------------------------------
 // next()
 // valeur de retour:
-//  char*: le prochain token à analyser.
+//  0: succès
+//  -1: plus aucun caractère à traiter.
+//  TOKEN_TOO_SMALL: pas assez d'espace pour
+//      stocker le token.
+// Renvoie le prochain caractère à 
+// traiter.
 //----------------------------------------
-char * next();
-
-//----------------------------------------
-// last()
-// valeur de retour:
-//  char*: le token précédent.
-//----------------------------------------
-char * last();
-
-//----------------------
-// getLastCharacters()
-// valeur de retour:
-//  char*: ?
-// description?
-//----------------------
-char * getLastCharacters(int strLength);
+int next(char**);
 
 #endif /* end of include guard: LEXICAL_4UGTM7YE */
 
