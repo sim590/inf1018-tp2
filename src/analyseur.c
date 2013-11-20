@@ -81,9 +81,11 @@ int main(int argc, char *argv[])
     loadFile(&MAIN_BUFFER, input_filename); 
     BUFLEN = strlen(MAIN_BUFFER);
 
+    INIT_POS = cur_pos = strdup(MAIN_BUFFER);
+
     // mise en tampon du lexique
     loadFile(&lexems, lexems_filename);
-
+    
     //lancement de l'analyse lexico-syntaxique
  
     exit(EXIT_SUCCESS);

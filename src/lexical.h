@@ -13,6 +13,14 @@
 #include <analyseur.h>
 
 const char delims[], delims_n_token[];
+static char *cur_pos;  /*
+                        * Première initialisation (qu'une seule fois), i.e aux
+                        * autres appels de next(), l'initialisation ne se fera
+                        * pas et donc on gardera un suivi sur la valeur de la
+                        * position (c'est dû au terminal "static").
+                        */
+static const char *INIT_POS;
+
 
 //----------------------------------------
 // next()

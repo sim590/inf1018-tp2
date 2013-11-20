@@ -7,24 +7,13 @@
 //-------------------------------------------------------
 #include "lexical.h"
 
-delims_n_token =  {'+', '-', '*', '/', ':', ';', '(', ')'};
-all_delims =  {' ', '\n', '\t','+', '-', '*', '/', ':', ';', '(', ')'};
+const char delims_n_token[] =  {'+', '-', '*', '/', ':', ';', '(', ')'},
+    all_delims[] =  {' ', '\n', '\t','+', '-', '*', '/', ':', ';', '(', ')'};
 
 int next(char **token)
 {
-    static char *cur_pos = strdup(MAIN_BUFFER),/*
-                                                * Première initialisation
-                                                * (qu'une seule fois), i.e aux
-                                                * autres appels de next(),
-                                                * l'initialisation ne se fera
-                                                * pas et donc on gardera un
-                                                * suivi sur la valeur de la
-                                                * position (c'est dû au
-                                                * terminal "static").
-                                                */
-                *tok = NULL;
+    char *tok = NULL;
     //pointeur initial
-    static const char *INIT_POS = cur_pos;
 
     while (in(all_delims, *(MAIN_BUFFER+cur_pos-INIT_POS))) {
         cur_pos++;
@@ -58,8 +47,9 @@ int next(char **token)
     return 0;
 }
 
-bool in(char delims[], char token)
+int in(char delims[], char token)
 {
+    int i;
     for (i = 0; i < strlen(delims); i++) {
         if (token == delims[i]) {
             return true;
