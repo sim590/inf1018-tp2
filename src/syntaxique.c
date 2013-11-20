@@ -7,24 +7,29 @@
 //-------------------------------------------------------
 #include "syntaxique.h"
 
-char * token = malloc(sizeof(char) * 16);
+char * token;
 
 int askForNext()
 {
     int size = next(&token);
     
     if (size > 0) {
-        token = malloc(sizeof(char) * size);
+        token = malloc(sizeof(char) * (size+1));
+        askForNext();
+    }
+    else {
+        fprintf(stdout, "Analyse du token : %s\n", token);
     }
 }
 
 int procedure()
 {
+    token = malloc(sizeof(char) * 16);
     askForNext();
 
     if (strcmp(token, "Procedure") != 0)
     {
-        //Erreur
+        fprintf(stderr, "Erreur : Le token attendu est : Procedure\n");
         return 0;
     }
 
@@ -40,7 +45,7 @@ int procedure()
     if (strcmp(token, "Fin_Procedure") != 0)
     {
         askForNext();
-        //Erreur
+        fprintf(stderr, "Erreur : Le token attendu est : Fin_Procedure\n");
         return 0;
     }
 
@@ -73,14 +78,16 @@ int declaration()
     askForNext();
 
     if (strcmp(token, ":") != 0) {
-        //erreur
+        fprintf(stderr, "Erreur : Le token attendu est : :\n");
+        
         return 0;
     }
 
     type();
 
     if (strcmp(token, ";") != 0) {
-        //erreur
+        fprintf(stderr, "Erreur : Le token attendu est : ;\n");
+        
         return 0;
     }
 
@@ -97,7 +104,8 @@ int type()
     askForNext();
 
     if (strcmp(token, "entier") != 0 && strcmp(token, "réel") != 0) {
-        //erreur
+        fprintf(stderr, "Erreur : Le type doit être : entier ou réel\n");
+        
         return 0;
     }
 }
@@ -105,7 +113,8 @@ int type()
 int identificator()
 {
     if (sizeof(*token) > 8) {
-        //erreur
+        fprintf(stderr, "Erreur : Un identificateur doit contenir maximum 8 caractères.\n");
+        
         return 0;
     }
     int position = 0;
@@ -114,7 +123,8 @@ int identificator()
     ascii = (int)*token;
 
     if (ascii < 65 || (ascii > 90 && ascii < 97) || ascii > 122) {
-        //erreur
+        fprintf(stderr, "Erreur : Le premier caractère d'un identificateur doit être une lettre.\n");
+        
         token -= position;
         return 0;
     }
@@ -126,7 +136,8 @@ int identificator()
         
         ascii =(int)*token;
         if (ascii < 48 || (ascii > 57 && ascii < 65) || (ascii > 90 && ascii < 97) || ascii > 122) {
-            //erreur
+            fprintf(stderr, "Erreur : Un identificateur doit contenir seulement des lettres et des chiffres.\n");
+            
             token -= position;
             return 0;
         }
@@ -162,7 +173,8 @@ int affectation_instruction()
     askForNext();
 
     if (strcmp(token, "=") != 0) {
-        //erreur
+        fprintf(stderr, "Erreur : Le token attendu est : =\n");
+       
         return 0;
     }
 
@@ -207,7 +219,8 @@ int factor()
    }
 
    if (strcmp(token, "(") != 0) {
-       //erreur 
+       fprintf(stderr, "Erreur : Le token attendu est un nombre, une variable ou (\n");
+       
        return 0;
    }
 
@@ -215,8 +228,9 @@ int factor()
 
    askForNext();
 
-   if (strcmp(token, ")") != 0) {
-       //erreur 
+   if (strcmp(token, ")") != 0) { 
+       fprintf(stderr, "Erreur : Le token attendu est : )\n");
+
        return 0;
    }
 
@@ -230,7 +244,7 @@ int number()
     float f;
 
     if (sscanf(token, "%f", &f) == 0){
-        //erreur
+        fprintf(stderr, "Erreur : Le token attendu doit être un nombre.\n");
         return 0;
     }
     return 1;

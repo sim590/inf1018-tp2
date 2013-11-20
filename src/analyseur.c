@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
     loadFile(&lexems, lexems_filename);
     
     //lancement de l'analyse lexico-syntaxique
- 
+    procedure();
+
     exit(EXIT_SUCCESS);
 }

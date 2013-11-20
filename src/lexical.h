@@ -12,7 +12,7 @@
 
 #include <analyseur.h>
 
-const char delims[], delims_n_token[];
+const char all_delims[11], delims_n_token[8];
 static char *cur_pos;  /*
                         * Première initialisation (qu'une seule fois), i.e aux
                         * autres appels de next(), l'initialisation ne se fera
