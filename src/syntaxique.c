@@ -7,11 +7,20 @@
 //-------------------------------------------------------
 #include "syntaxique.h"
 
-char * token;
+char * token = malloc(sizeof(char) * 16);
+
+int askForNext()
+{
+    int size = next(&token);
+    
+    if (size > 0) {
+        token = malloc(sizeof(char) * size);
+    }
+}
 
 int procedure()
 {
-    next(&token);
+    askForNext();
 
     if (strcmp(token, "Procedure") != 0)
     {
@@ -19,7 +28,7 @@ int procedure()
         return 0;
     }
 
-    next(&token);
+    askForNext();
 
     identificator();
 
@@ -30,12 +39,12 @@ int procedure()
 
     if (strcmp(token, "Fin_Procedure") != 0)
     {
-        next(&token);
+        askForNext();
         //Erreur
         return 0;
     }
 
-    next(&token);
+    askForNext();
 
     identificator();
 
@@ -44,7 +53,7 @@ int procedure()
 
 int declarations()
 {
-    next(&token);
+    askForNext();
 
     while (strcmp(token, "declare") == 0) {
         declaration();
@@ -57,11 +66,11 @@ int declarations()
 
 int declaration()
 {
-    next(&token);
+    askForNext();
     
     variable();
 
-    next(&token);
+    askForNext();
 
     if (strcmp(token, ":") != 0) {
         //erreur
@@ -85,7 +94,7 @@ int variable()
 
 int type()
 {
-    next(&token);
+    askForNext();
 
     if (strcmp(token, "entier") != 0 && strcmp(token, "réel") != 0) {
         //erreur
@@ -134,11 +143,11 @@ int affectation_instructions()
 {
     affectation_instruction();
 
-    next(&token);
+    askForNext();
     do {
         affectation_instruction();
         if (strcmp(token, ";") !=0) 
-            next(&token);
+            askForNext();
     } while (strcmp(token, ";") == 0);
 
     return 1;
@@ -146,11 +155,11 @@ int affectation_instructions()
 
 int affectation_instruction()
 {
-    next(&token);
+    askForNext();
 
     variable();
 
-    next(&token);
+    askForNext();
 
     if (strcmp(token, "=") != 0) {
         //erreur
@@ -168,7 +177,7 @@ int arithmetic_expression()
     {
         term();
         if (strcmp(token, "+") != 0 && strcmp(token, "-") != 0)
-            next(&token);
+            askForNext();
     } while (strcmp(token, "+") == 0 || strcmp(token, "-") == 0);
 
     return 1;
@@ -179,7 +188,7 @@ int term()
     do 
     {
         factor();
-        next(&token);
+        askForNext();
     } while (strcmp(token, "*") == 0 || strcmp(token, "/") == 0);
 
     return 1;
@@ -187,7 +196,7 @@ int term()
 
 int factor()
 {
-   next(&token);
+   askForNext();
 
    if (variable() == 1) {
         return 1;
@@ -204,7 +213,7 @@ int factor()
 
    arithmetic_expression();
 
-   next(&token);
+   askForNext();
 
    if (strcmp(token, ")") != 0) {
        //erreur 
@@ -216,7 +225,7 @@ int factor()
 
 int number()
 {
-    next(&token);
+    askForNext();
     
     float f;
 
