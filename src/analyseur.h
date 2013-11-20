@@ -8,6 +8,8 @@
 #ifndef ANALYSEUR_4BB0V0UD
 
 #define ANALYSEUR_4BB0V0UD
+
+
 #include <lexical.h>
 #include <syntaxique.h>
 #include <stdio.h>
@@ -29,7 +31,8 @@ OPTIONS\n\
 \t\tAffiche un texte d\'aide\n"
 
 //Variables
-char *buffer, *input_filename, *lexems, *lexems_filename;
+char *MAIN_BUFFER, *input_filename, *lexems, *lexems_filename;
+int BUFLEN; // longueur de MAIN_BUFFER en excluant le '\0' char
 
 //-----------
 //Fonctions
