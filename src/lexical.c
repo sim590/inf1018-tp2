@@ -15,12 +15,12 @@ int next(char **token)
     char *tok = NULL;
     //pointeur initial
 
-    while (in(all_delims, *(MAIN_BUFFER+cur_pos-INIT_POS)) == 1) {
+    while (in(all_delims, *((char*)((long)MAIN_BUFFER+(long)cur_pos-(long)INIT_POS)))) {
         cur_pos++;
         
         // si le token est un délimiteur
-        if (in(delims_n_token, *(MAIN_BUFFER+cur_pos-INIT_POS-1)) == 1) {
-            sprintf(*token, "%c\0", *(MAIN_BUFFER+cur_pos-INIT_POS-1));
+        if (in(delims_n_token, *((char*)((long)MAIN_BUFFER+(long)cur_pos-(long)INIT_POS-1)))) {
+            sprintf(*token, "%c\0", *((char*)((long)MAIN_BUFFER+(long)cur_pos-(long)INIT_POS-1)));
             return 0;
         }
     }
@@ -47,7 +47,7 @@ int next(char **token)
     return 0;
 }
 
-int in(char delims[], char token)
+int in(const char delims[], char token)
 {
     int i;
     for (i = 0; i < strlen(delims); i++) {

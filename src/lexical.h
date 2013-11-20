@@ -27,12 +27,14 @@ static const char *INIT_POS;
 // valeur de retour:
 //  0: succès
 //  -1: plus aucun caractère à traiter.
-//  TOKEN_TOO_SMALL: pas assez d'espace pour
-//      stocker le token.
+//  x (>0): espace nécessaire pour stocker
+//      le token.
 // Renvoie le prochain caractère à 
 // traiter.
 //----------------------------------------
 int next(char**);
+
+int in(const char[], char);
 
 #endif /* end of include guard: LEXICAL_4UGTM7YE */
 

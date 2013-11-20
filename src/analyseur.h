@@ -18,20 +18,18 @@
 #include <unistd.h>
 #include <getopt.h>
 
-#define LEXEMS_FILENAME "./lexems"
-#define MISSING_ARG "Arguemnt manquant."
+#define MISSING_ARG "Arguemnt manquant"
+#define TRY_HELP "essayez inf1018tp2 --help"
 #define HELP "inf1018tp2 -- analyseur lexical et syntaxique\n\
 SYNPOSYS : inf1018tp2 [OPTIONS] file\n\
 \tfile\n\
 \t\tLe fichier duquel tirer le texte à anlayser.\n\
 OPTIONS\n\
-\t-l|--lexems lexems_filename\n\
-\t\tIndique le fichier dans lequel prendre le lexique (par défaut: ./lexems)\n\
 \t-h|--help\n\
 \t\tAffiche un texte d\'aide\n"
 
 //Variables
-char *MAIN_BUFFER, *input_filename, *lexems, *lexems_filename;
+char *MAIN_BUFFER, *input_filename;
 int BUFLEN; // longueur de MAIN_BUFFER en excluant le '\0' char
 
 //-----------
