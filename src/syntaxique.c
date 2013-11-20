@@ -11,7 +11,7 @@ char * token;
 
 int procedure()
 {
-    token = next();
+    next(&token);
 
     if (strcmp(token, "Procedure") != 0)
     {
@@ -19,19 +19,23 @@ int procedure()
         return 0;
     }
 
+    next(&token);
+
     identificator();
 
     declarations();
 
     affectation_instructions();
 
-    token = next();
 
     if (strcmp(token, "Fin_Procedure") != 0)
     {
+        next(&token);
         //Erreur
         return 0;
     }
+
+    next(&token);
 
     identificator();
 
@@ -40,22 +44,24 @@ int procedure()
 
 int declarations()
 {
-    token = next();
+    next(&token);
 
     while (strcmp(token, "declare") == 0) {
         declaration();
     }
 
-    token = last();
+    
 
     return 1;
 }
 
 int declaration()
 {
+    next(&token);
+    
     variable();
 
-    token = next();
+    next(&token);
 
     if (strcmp(token, ":") != 0) {
         //erreur
@@ -79,7 +85,7 @@ int variable()
 
 int type()
 {
-    token = next();
+    next(&token);
 
     if (strcmp(token, "entier") != 0 && strcmp(token, "réel") != 0) {
         //erreur
@@ -89,35 +95,38 @@ int type()
 
 int identificator()
 {
-    token = next();
-
     if (sizeof(*token) > 8) {
         //erreur
         return 0;
     }
-
+    int position = 0;
     int ascii;
 
     ascii = (int)*token;
 
     if (ascii < 65 || (ascii > 90 && ascii < 97) || ascii > 122) {
         //erreur
+        token -= position;
         return 0;
     }
     
     token++;
+    position++;
 
     while (*token != '\0') {
         
         ascii =(int)*token;
         if (ascii < 48 || (ascii > 57 && ascii < 65) || (ascii > 90 && ascii < 97) || ascii > 122) {
             //erreur
+            token -= position;
             return 0;
         }
 
         token++;
+        position++;
     }
 
+    token -= position;
     return 1;
 }
 
@@ -125,23 +134,23 @@ int affectation_instructions()
 {
     affectation_instruction();
 
-    token = next();
-    while (strcmp(token, ";") == 0) {
+    next(&token);
+    do {
         affectation_instruction();
-
-        token = next();
-    }
-
-    token = last();
+        if (strcmp(token, ";") !=0) 
+            next(&token);
+    } while (strcmp(token, ";") == 0);
 
     return 1;
 }
 
 int affectation_instruction()
 {
+    next(&token);
+
     variable();
 
-    token = next();
+    next(&token);
 
     if (strcmp(token, "=") != 0) {
         //erreur
@@ -155,42 +164,34 @@ int affectation_instruction()
 
 int arithmetic_expression()
 {
-    term();
-
-    token = next();
-
-    while (strcmp(token, "+") == 0 || strcmp(token, "-") == 0) {
+    do
+    {
         term();
-        token = next();
-    }
-
-    token = last();
+        if (strcmp(token, "+") != 0 && strcmp(token, "-") != 0)
+            next(&token);
+    } while (strcmp(token, "+") == 0 || strcmp(token, "-") == 0);
 
     return 1;
 }
 
 int term()
 {
-    factor();
-
-    token = next();
-    while (strcmp(token, "*") == 0 || strcmp(token, "/") == 0) {
+    do 
+    {
         factor();
-        token = next();
-    }
-
-    token = last();
+        next(&token);
+    } while (strcmp(token, "*") == 0 || strcmp(token, "/") == 0);
 
     return 1;
 }
 
 int factor()
 {
+   next(&token);
+
    if (variable() == 1) {
         return 1;
    }
-
-   token = last();
 
    if (number() == 1) {
         return 1;
@@ -203,7 +204,7 @@ int factor()
 
    arithmetic_expression();
 
-   token = next();
+   next(&token);
 
    if (strcmp(token, ")") != 0) {
        //erreur 
@@ -215,7 +216,7 @@ int factor()
 
 int number()
 {
-    token = next();
+    next(&token);
     
     float f;
 
