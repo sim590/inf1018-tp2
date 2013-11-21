@@ -18,8 +18,8 @@ int askForNext()
         askForNext();
     }
     else if (size == -1) {
-        fprintf(stderr, "Erreur : Espace mémoire non-alloué\n");
-        exit(EXIT_FAILURE);
+        fprintf(stdout, "Analyse lexicale et syntaxique terminée.\n");
+        exit(EXIT_SUCCESS);
     }
     else if (!size)
         printf("Analyse du token : %s\n", token);
@@ -118,7 +118,7 @@ int type()
 
 int identificator(int message)
 {
-    if (sizeof(*token) > 8) {
+    if (strlen(token) > 8) {
         if (message)
             fprintf(stderr, "Erreur : Un identificateur doit contenir maximum 8 caractères.\n");
         
