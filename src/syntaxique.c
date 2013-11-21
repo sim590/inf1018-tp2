@@ -88,7 +88,9 @@ int declaration()
 
     type();
 
-    if (*token == ';') {
+    askForNext();
+
+    if (*token != ';') {
         fprintf(stderr, "Erreur : Le token attendu est : ;\n");
         
         return -1;

@@ -1,6 +1,6 @@
 
 Procedure procedure1
-declare var1:entier;
+declare var1 : entier ;
 declare var2:reel;
 
 var1 = 3;

@@ -44,7 +44,7 @@ int next(char **token)
         return toksize;
     }
 
-    cur_pos += toksize+1;
+    cur_pos += toksize;
     strcpy(*token, tok);
     return 0;
 }
