@@ -18,8 +18,8 @@ int askForNext()
         askForNext();
     }
     else if (size == -1) {
-        fprintf(stdout, "Analyse lexicale et syntaxique terminée.\n");
-        exit(EXIT_SUCCESS);
+        fprintf(stderr, "Erreur : Fin du fichier inattendue.\n");
+        exit(EXIT_FAILURE);
     }
     else if (!size)
         printf("Analyse du token : %s\n", token);
@@ -47,7 +47,6 @@ int procedure()
 
     if (strcmp(token, "Fin_Procedure") != 0)
     {
-        askForNext();
         fprintf(stderr, "Erreur : Le token attendu est : Fin_Procedure\n");
         return -1;
     }
@@ -77,7 +76,7 @@ int declaration()
 {
     askForNext();
     
-    variable(1);
+    identificator(1);
 
     askForNext();
 
@@ -100,10 +99,6 @@ int declaration()
     return 0;
 }
 
-int variable(int message)
-{
-    return identificator(message);
-}
 
 int type()
 {
@@ -167,14 +162,13 @@ int affectation_instructions()
         if (*token != ';') 
             askForNext();
     } while (!*token == ';');
-
     return 0;
 }
 
 int affectation_instruction()
 {
 
-    variable(1);
+    identificator(1);
 
     askForNext();
 
@@ -196,7 +190,7 @@ int arithmetic_expression()
         term();
         if (*token != '+' && *token != '-')
             askForNext();
-    } while (!*token == '+' || !*token == '-');
+    } while (*token == '+' || *token == '-');
 
     return 0;
 }
@@ -206,8 +200,9 @@ int term()
     do 
     {
         factor();
-        askForNext();
-    } while (!*token != '*' || !*token != '/');
+        if (*token != '*' && *token != '/')
+            askForNext();
+    } while (*token == '*' || *token == '/');
 
     return 0;
 }
@@ -216,15 +211,15 @@ int factor()
 {
    askForNext();
 
-   if (!variable(0)) {
+   if (identificator(0)) {
         return 0;
    }
 
-   if (!number(0)) {
+   if (number(0)) {
         return 0;
    }
 
-   if (*token == '(') {
+   if (*token != '(') {
        fprintf(stderr, "Erreur : Le token attendu est un nombre, une variable ou (\n");
        
        return -1;

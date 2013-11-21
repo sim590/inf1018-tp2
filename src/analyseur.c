@@ -75,7 +75,9 @@ int main(int argc, char *argv[])
 
     
     //lancement de l'analyse lexico-syntaxique
-    procedure();
+    while (cur_pos < INIT_POS + BUFLEN)
+        procedure();
+
 
     exit(EXIT_SUCCESS);
 }
