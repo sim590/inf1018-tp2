@@ -17,12 +17,12 @@ int declarations();
 int declaration();
 int affectation_instructions();
 int affectation_instruction();
-int variable();
+int variable(int);
 int type();
-int identificator();
+int identificator(int);
 int arithmetic_expression();
 int term();
 int factor();
-int number();
+int number(int);
 
 #endif

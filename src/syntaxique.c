@@ -38,7 +38,7 @@ int procedure()
 
     askForNext();
 
-    identificator();
+    identificator(1);
 
     declarations();
 
@@ -54,7 +54,7 @@ int procedure()
 
     askForNext();
 
-    identificator();
+    identificator(1);
 
     return 0;
 }
@@ -65,6 +65,7 @@ int declarations()
 
     while (strcmp(token, "declare") == 0) {
         declaration();
+        askForNext();
     }
 
     
@@ -76,11 +77,11 @@ int declaration()
 {
     askForNext();
     
-    variable();
+    variable(1);
 
     askForNext();
 
-    if (*token == ':') {
+    if (*token != ':') {
         fprintf(stderr, "Erreur : Le token attendu est : :\n");
         
         return -1;
@@ -99,9 +100,9 @@ int declaration()
     return 0;
 }
 
-int variable()
+int variable(int message)
 {
-    return identificator();
+    return identificator(message);
 }
 
 int type()
@@ -115,10 +116,11 @@ int type()
     }
 }
 
-int identificator()
+int identificator(int message)
 {
     if (sizeof(*token) > 8) {
-        fprintf(stderr, "Erreur : Un identificateur doit contenir maximum 8 caractères.\n");
+        if (message)
+            fprintf(stderr, "Erreur : Un identificateur doit contenir maximum 8 caractères.\n");
         
         return -1;
     }
@@ -128,7 +130,8 @@ int identificator()
     ascii = (int)*token;
 
     if (ascii < 65 || (ascii > 90 && ascii < 97) || ascii > 122) {
-        fprintf(stderr, "Erreur : Le premier caractère d'un identificateur doit être une lettre.\n");
+        if (message)
+            fprintf(stderr, "Erreur : Le premier caractère d'un identificateur doit être une lettre.\n");
         
         token -= position;
         return -1;
@@ -141,7 +144,8 @@ int identificator()
         
         ascii =(int)*token;
         if (ascii < 48 || (ascii > 57 && ascii < 65) || (ascii > 90 && ascii < 97) || ascii > 122) {
-            fprintf(stderr, "Erreur : Un identificateur doit contenir seulement des lettres et des chiffres.\n");
+            if (message)
+                fprintf(stderr, "Erreur : Un identificateur doit contenir seulement des lettres et des chiffres.\n");
             
             token -= position;
             return -1;
@@ -157,9 +161,7 @@ int identificator()
 
 int affectation_instructions()
 {
-    affectation_instruction();
 
-    askForNext();
     do {
         affectation_instruction();
         if (*token == ';') 
@@ -171,13 +173,12 @@ int affectation_instructions()
 
 int affectation_instruction()
 {
+
+    variable(1);
+
     askForNext();
 
-    variable();
-
-    askForNext();
-
-    if (*token == '=') {
+    if (*token != '=') {
         fprintf(stderr, "Erreur : Le token attendu est : =\n");
        
         return -1;
@@ -215,11 +216,11 @@ int factor()
 {
    askForNext();
 
-   if (!variable()) {
+   if (!variable(0)) {
         return 0;
    }
 
-   if (!number()) {
+   if (!number(0)) {
         return 0;
    }
 
@@ -242,14 +243,15 @@ int factor()
    return 0; 
 }
 
-int number()
+int number(int message)
 {
     askForNext();
     
     float f;
 
     if (sscanf(token, "%f", &f) == 0){
-        fprintf(stderr, "Erreur : Le token attendu doit être un nombre.\n");
+        if (message)
+            fprintf(stderr, "Erreur : Le token attendu doit être un nombre.\n");
         return -1;
     }
     return 0;

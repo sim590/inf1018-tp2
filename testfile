@@ -1,7 +1,7 @@
 
 Procedure procedure1
 declare var1 : entier ;
-declare var2:reel;
+declare var2:réel;
 
 var1 = 3;
 var2 = 6.5;
