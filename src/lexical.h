@@ -11,9 +11,8 @@
 
 #include <analyseur.h>
 
-const char all_delims[11], delims_n_token[8];
-extern char *cur_pos;
-extern long INIT_POS;
+const char all_delims[13], delims_n_token[10];
+char *cur_pos, *INIT_POS;
 
 
 //----------------------------------------

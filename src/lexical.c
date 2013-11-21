@@ -7,27 +7,27 @@
 //-------------------------------------------------------
 #include "lexical.h"
 
-const char delims_n_token[] =  {'+', '-', '*', '/', ':', ';', '(', ')'},
-    all_delims[] =  {' ', '\n', '\t','+', '-', '*', '/', ':', ';', '(', ')'};
+const char delims_n_token[] =  {'=', '+', '-', '*', '/', ':', ';', '(', ')', '\0'},
+    all_delims[] =  {' ', '\n', '\t', '=', '+', '-', '*', '/', ':', ';', '(', ')', '\0'}; // On doit terminer le array par un \0 pour  
 
 int next(char **token)
 {
     
     char *tok = NULL;
 
-    while (in(all_delims, *((char*)((long)MAIN_BUFFER+(long)cur_pos-INIT_POS)))) {
+    while (in(all_delims, MAIN_BUFFER[cur_pos-INIT_POS])) { //*((char*)((long)MAIN_BUFFER+(long)cur_pos-INIT_POS)) 
 
         cur_pos++;
         
         // si le token est un délimiteur
-        if (in(delims_n_token, *((char*)((long)MAIN_BUFFER+(long)cur_pos-INIT_POS-1)))) {
-            sprintf(*token, "%c\0", *((char*)((long)MAIN_BUFFER+(long)cur_pos-INIT_POS-1)));
+        if (in(delims_n_token, MAIN_BUFFER[cur_pos-INIT_POS-1])) {
+            sprintf(*token, "%c\0", MAIN_BUFFER[cur_pos-INIT_POS-1]);
             return 0;
         }
     }
 
     // dépassemnet de l'espace mémoire réservé
-    if ((long)cur_pos >= INIT_POS+BUFLEN-1) {
+    if (cur_pos >= INIT_POS+BUFLEN-1) {
         *token = NULL;
         return -1;
     }
