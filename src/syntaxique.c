@@ -164,7 +164,7 @@ int affectation_instructions()
 
     do {
         affectation_instruction();
-        if (*token == ';') 
+        if (*token != ';') 
             askForNext();
     } while (!*token == ';');
 
@@ -194,7 +194,7 @@ int arithmetic_expression()
     do
     {
         term();
-        if (*token == '+' && *token == '-')
+        if (*token != '+' && *token != '-')
             askForNext();
     } while (!*token == '+' || !*token == '-');
 
@@ -207,7 +207,7 @@ int term()
     {
         factor();
         askForNext();
-    } while (!*token == '*' || !*token == '/');
+    } while (!*token != '*' || !*token != '/');
 
     return 0;
 }
@@ -234,7 +234,7 @@ int factor()
 
    askForNext();
 
-   if (*token == ')') { 
+   if (*token != ')') { 
        fprintf(stderr, "Erreur : Le token attendu est : )\n");
 
        return -1;
