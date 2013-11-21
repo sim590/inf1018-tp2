@@ -9,17 +9,16 @@
 
 #define LEXICAL_4UGTM7YE
 
-
 #include <analyseur.h>
 
-const char all_delims[11], delims_n_token[8];
-static char *cur_pos;  /*
+const char all_delims[12], delims_n_token[8];
+extern char *cur_pos;  /*
                         * Première initialisation (qu'une seule fois), i.e aux
                         * autres appels de next(), l'initialisation ne se fera
                         * pas et donc on gardera un suivi sur la valeur de la
                         * position (c'est dû au terminal "static").
                         */
-static const char *INIT_POS;
+extern const char *INIT_POS;
 
 
 //----------------------------------------

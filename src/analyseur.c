@@ -7,6 +7,9 @@
 //-------------------------------------------------------
 #include <analyseur.h>
 
+const char * INIT_POS;
+char * cur_pos;
+
 void loadFile(char **buffer, char *filename)
 {
     FILE *fp;
@@ -70,7 +73,9 @@ int main(int argc, char *argv[])
     loadFile(&MAIN_BUFFER, input_filename); 
     BUFLEN = strlen(MAIN_BUFFER);
 
-    INIT_POS = cur_pos = strdup(MAIN_BUFFER);
+    INIT_POS = strdup(MAIN_BUFFER);
+    cur_pos = strdup(MAIN_BUFFER);
+
     
     //lancement de l'analyse lexico-syntaxique
     procedure();

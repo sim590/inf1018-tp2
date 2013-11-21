@@ -8,14 +8,16 @@
 #include "lexical.h"
 
 const char delims_n_token[] =  {'+', '-', '*', '/', ':', ';', '(', ')'},
-    all_delims[] =  {' ', '\n', '\t','+', '-', '*', '/', ':', ';', '(', ')'};
+    all_delims[] =  {' ', '\0',  '\n', '\t','+', '-', '*', '/', ':', ';', '(', ')'};
 
 int next(char **token)
 {
+    
     char *tok = NULL;
-    //pointeur initial
 
+    //pointeur initial
     while (in(all_delims, *((char*)((long)MAIN_BUFFER+(long)cur_pos-(long)INIT_POS)))) {
+
         cur_pos++;
         
         // si le token est un délimiteur
@@ -31,10 +33,11 @@ int next(char **token)
         return -1;
     }
 
+
     // on récupère le token
     tok = strtok(cur_pos, all_delims);
 
-    int toksize = strlen(tok);
+    int toksize = strlen(tok);   
     if (toksize > malloc_usable_size(*token)) {
         *token = NULL;
         
