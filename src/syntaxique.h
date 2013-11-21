@@ -10,9 +10,7 @@
 
 #define SYNTAXIQUE_4WEDD4T
 
-
 #include <analyseur.h>
-#include "lexical.h"
 
 int procedure();
 int declarations();

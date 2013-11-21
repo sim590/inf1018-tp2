@@ -9,12 +9,11 @@
 
 #define LEXICAL_4UGTM7YE
 
-
 #include <analyseur.h>
 
-char *cur_pos;
-const char *INIT_POS;
 const char all_delims[11], delims_n_token[8];
+extern char *cur_pos;
+extern long INIT_POS;
 
 
 //----------------------------------------

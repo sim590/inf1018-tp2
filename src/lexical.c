@@ -12,28 +12,31 @@ const char delims_n_token[] =  {'+', '-', '*', '/', ':', ';', '(', ')'},
 
 int next(char **token)
 {
+    
     char *tok = NULL;
 
-    while (in(all_delims, *((char*)((long)MAIN_BUFFER+(long)cur_pos-(long)INIT_POS)))) {
+    while (in(all_delims, *((char*)((long)MAIN_BUFFER+(long)cur_pos-INIT_POS)))) {
+
         cur_pos++;
         
         // si le token est un délimiteur
-        if (in(delims_n_token, *((char*)((long)MAIN_BUFFER+(long)cur_pos-(long)INIT_POS-1)))) {
-            sprintf(*token, "%c\0", *((char*)((long)MAIN_BUFFER+(long)cur_pos-(long)INIT_POS-1)));
+        if (in(delims_n_token, *((char*)((long)MAIN_BUFFER+(long)cur_pos-INIT_POS-1)))) {
+            sprintf(*token, "%c\0", *((char*)((long)MAIN_BUFFER+(long)cur_pos-INIT_POS-1)));
             return 0;
         }
     }
 
     // dépassemnet de l'espace mémoire réservé
-    if (cur_pos >= INIT_POS+BUFLEN-1) {
+    if ((long)cur_pos >= INIT_POS+BUFLEN-1) {
         *token = NULL;
         return -1;
     }
 
+
     // on récupère le token
     tok = strtok(cur_pos, all_delims);
 
-    int toksize = strlen(tok);
+    int toksize = strlen(tok);   
     if (toksize > malloc_usable_size(*token)) {
         *token = NULL;
         
