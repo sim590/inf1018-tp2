@@ -125,10 +125,10 @@ int identificator(int message)
     ascii = (int)*token;
 
     if (ascii < 65 || (ascii > 90 && ascii < 97) || ascii > 122) {
+        
         if (message)
             fprintf(stderr, "Erreur : Le premier caractère d'un identificateur doit être une lettre.\n");
         
-        token -= position;
         return -1;
     }
     
@@ -158,10 +158,10 @@ int affectation_instructions()
 {
 
     do {
-        affectation_instruction();
-        if (*token != ';') 
+        if (*token == ';')
             askForNext();
-    } while (!*token == ';');
+        affectation_instruction();
+    } while (*token == ';');
     return 0;
 }
 
@@ -188,7 +188,7 @@ int arithmetic_expression()
     do
     {
         term();
-        if (*token != '+' && *token != '-')
+        if (*token != '+' && *token != '-' && *token != ';' && strcmp(token,"Fin_Procedure") != 0 && *token != ')')
             askForNext();
     } while (*token == '+' || *token == '-');
 
@@ -200,7 +200,7 @@ int term()
     do 
     {
         factor();
-        if (*token != '*' && *token != '/')
+        if (*token != '*' && *token != '/' && *token != '+' && *token != '-' && *token != ';' && strcmp(token,"Fin_Procedure") != 0 && *token != ')')
             askForNext();
     } while (*token == '*' || *token == '/');
 
@@ -211,11 +211,11 @@ int factor()
 {
    askForNext();
 
-   if (identificator(0)) {
+   if (!identificator(0)) {
         return 0;
    }
 
-   if (number(0)) {
+   if (!number(0)) {
         return 0;
    }
 
@@ -227,7 +227,6 @@ int factor()
 
    arithmetic_expression();
 
-   askForNext();
 
    if (*token != ')') { 
        fprintf(stderr, "Erreur : Le token attendu est : )\n");
@@ -235,12 +234,12 @@ int factor()
        return -1;
    }
 
+   askForNext();
    return 0; 
 }
 
 int number(int message)
 {
-    askForNext();
     
     float f;
 
