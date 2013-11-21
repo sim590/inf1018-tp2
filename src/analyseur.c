@@ -7,6 +7,9 @@
 //-------------------------------------------------------
 #include <analyseur.h>
 
+extern char *cur_pos;
+extern const char *INIT_POS;
+
 void loadFile(char **buffer, char *filename)
 {
     FILE *fp;

@@ -17,9 +17,12 @@ int askForNext()
         token = malloc(sizeof(char) * (size+1));
         askForNext();
     }
-    else {
-        fprintf(stdout, "Analyse du token : %s\n", token);
+    else if (size == -1) {
+        fprintf(stderr, "Erreur : Espace mémoire non-alloué\n");
+        exit(EXIT_FAILURE);
     }
+    else if (!size)
+        printf("Analyse du token : %s\n", token);
 }
 
 int procedure()
@@ -30,7 +33,7 @@ int procedure()
     if (strcmp(token, "Procedure") != 0)
     {
         fprintf(stderr, "Erreur : Le token attendu est : Procedure\n");
-        return 0;
+        return -1;
     }
 
     askForNext();
@@ -46,14 +49,14 @@ int procedure()
     {
         askForNext();
         fprintf(stderr, "Erreur : Le token attendu est : Fin_Procedure\n");
-        return 0;
+        return -1;
     }
 
     askForNext();
 
     identificator();
 
-    return 1;
+    return 0;
 }
 
 int declarations()
@@ -66,7 +69,7 @@ int declarations()
 
     
 
-    return 1;
+    return 0;
 }
 
 int declaration()
@@ -77,21 +80,21 @@ int declaration()
 
     askForNext();
 
-    if (strcmp(token, ":") != 0) {
+    if (*token == ':') {
         fprintf(stderr, "Erreur : Le token attendu est : :\n");
         
-        return 0;
+        return -1;
     }
 
     type();
 
-    if (strcmp(token, ";") != 0) {
+    if (*token == ';') {
         fprintf(stderr, "Erreur : Le token attendu est : ;\n");
         
-        return 0;
+        return -1;
     }
 
-    return 1;
+    return 0;
 }
 
 int variable()
@@ -106,7 +109,7 @@ int type()
     if (strcmp(token, "entier") != 0 && strcmp(token, "réel") != 0) {
         fprintf(stderr, "Erreur : Le type doit être : entier ou réel\n");
         
-        return 0;
+        return -1;
     }
 }
 
@@ -115,7 +118,7 @@ int identificator()
     if (sizeof(*token) > 8) {
         fprintf(stderr, "Erreur : Un identificateur doit contenir maximum 8 caractères.\n");
         
-        return 0;
+        return -1;
     }
     int position = 0;
     int ascii;
@@ -126,7 +129,7 @@ int identificator()
         fprintf(stderr, "Erreur : Le premier caractère d'un identificateur doit être une lettre.\n");
         
         token -= position;
-        return 0;
+        return -1;
     }
     
     token++;
@@ -139,7 +142,7 @@ int identificator()
             fprintf(stderr, "Erreur : Un identificateur doit contenir seulement des lettres et des chiffres.\n");
             
             token -= position;
-            return 0;
+            return -1;
         }
 
         token++;
@@ -147,7 +150,7 @@ int identificator()
     }
 
     token -= position;
-    return 1;
+    return 0;
 }
 
 int affectation_instructions()
@@ -157,11 +160,11 @@ int affectation_instructions()
     askForNext();
     do {
         affectation_instruction();
-        if (strcmp(token, ";") !=0) 
+        if (*token == ';') 
             askForNext();
-    } while (strcmp(token, ";") == 0);
+    } while (!*token == ';');
 
-    return 1;
+    return 0;
 }
 
 int affectation_instruction()
@@ -172,15 +175,15 @@ int affectation_instruction()
 
     askForNext();
 
-    if (strcmp(token, "=") != 0) {
+    if (*token == '=') {
         fprintf(stderr, "Erreur : Le token attendu est : =\n");
        
-        return 0;
+        return -1;
     }
 
     arithmetic_expression();
 
-    return 1;
+    return 0;
 }
 
 int arithmetic_expression()
@@ -188,11 +191,11 @@ int arithmetic_expression()
     do
     {
         term();
-        if (strcmp(token, "+") != 0 && strcmp(token, "-") != 0)
+        if (*token == '+' && *token == '-')
             askForNext();
-    } while (strcmp(token, "+") == 0 || strcmp(token, "-") == 0);
+    } while (!*token == '+' || !*token == '-');
 
-    return 1;
+    return 0;
 }
 
 int term()
@@ -201,40 +204,40 @@ int term()
     {
         factor();
         askForNext();
-    } while (strcmp(token, "*") == 0 || strcmp(token, "/") == 0);
+    } while (!*token == '*' || !*token == '/');
 
-    return 1;
+    return 0;
 }
 
 int factor()
 {
    askForNext();
 
-   if (variable() == 1) {
-        return 1;
+   if (!variable()) {
+        return 0;
    }
 
-   if (number() == 1) {
-        return 1;
+   if (!number()) {
+        return 0;
    }
 
-   if (strcmp(token, "(") != 0) {
+   if (*token == '(') {
        fprintf(stderr, "Erreur : Le token attendu est un nombre, une variable ou (\n");
        
-       return 0;
+       return -1;
    }
 
    arithmetic_expression();
 
    askForNext();
 
-   if (strcmp(token, ")") != 0) { 
+   if (*token == ')') { 
        fprintf(stderr, "Erreur : Le token attendu est : )\n");
 
-       return 0;
+       return -1;
    }
 
-   return 1; 
+   return 0; 
 }
 
 int number()
@@ -245,7 +248,7 @@ int number()
 
     if (sscanf(token, "%f", &f) == 0){
         fprintf(stderr, "Erreur : Le token attendu doit être un nombre.\n");
-        return 0;
+        return -1;
     }
-    return 1;
+    return 0;
 }

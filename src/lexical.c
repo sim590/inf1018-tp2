@@ -13,7 +13,6 @@ const char delims_n_token[] =  {'+', '-', '*', '/', ':', ';', '(', ')'},
 int next(char **token)
 {
     char *tok = NULL;
-    //pointeur initial
 
     while (in(all_delims, *((char*)((long)MAIN_BUFFER+(long)cur_pos-(long)INIT_POS)))) {
         cur_pos++;
@@ -42,7 +41,7 @@ int next(char **token)
         return toksize;
     }
 
-    cur_pos += toksize;
+    cur_pos += toksize+1;
     strcpy(*token, tok);
     return 0;
 }
