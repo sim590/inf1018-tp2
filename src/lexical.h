@@ -20,6 +20,7 @@ char *cur_pos, *INIT_POS;
 // valeur de retour:
 //  0: succès
 //  -1: plus aucun caractère à traiter.
+//  -2: dépassement de l'espace tampon.
 //  x (>0): espace nécessaire pour stocker
 //      le token.
 // Renvoie le prochain caractère à 

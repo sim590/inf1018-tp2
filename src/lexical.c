@@ -13,6 +13,13 @@ const char delims_n_token[] =  {'=', '+', '-', '*', '/', ':', ';', '(', ')', '\0
 int next(char **token)
 {
     
+    // plus de token à analyser, mais
+    // dépassemnet de l'espace mémoire réservé
+    if (cur_pos > INIT_POS+BUFLEN-1) {
+        *token = NULL+1;
+        return -2;
+    }
+
     char *tok = NULL;
 
     while (in(all_delims, MAIN_BUFFER[cur_pos-INIT_POS])) { //*((char*)((long)MAIN_BUFFER+(long)cur_pos-INIT_POS)) 
@@ -26,15 +33,14 @@ int next(char **token)
         }
     }
 
-    // dépassemnet de l'espace mémoire réservé
-    if (cur_pos >= INIT_POS+BUFLEN-1) {
+    // on récupère le token
+    tok = strtok(cur_pos, all_delims);
+
+    // plus de token à analyser
+    if (!tok) {
         *token = NULL;
         return -1;
     }
-
-
-    // on récupère le token
-    tok = strtok(cur_pos, all_delims);
 
     int toksize = strlen(tok);   
     if (toksize > malloc_usable_size(*token)) {

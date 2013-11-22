@@ -17,7 +17,7 @@ int askForNext()
         token = malloc(sizeof(char) * (size+1));
         askForNext();
     }
-    else if (size == -1) {
+    else if (size < 0) {
         fprintf(stderr, "Erreur : Fin du fichier inattendue.\n");
         exit(EXIT_FAILURE);
     }
@@ -25,9 +25,19 @@ int askForNext()
         printf("Analyse du token : %s\n", token);
 }
 
+int analyse_syntax()
+{
+    token = malloc(sizeof(char)*16);
+
+    while (cur_pos < INIT_POS + BUFLEN)
+        if(procedure())
+            return -1;
+
+    return 0;
+}
+
 int procedure()
 {
-    token = malloc(sizeof(char) * 16);
     askForNext();
 
     if (strcmp(token, "Procedure") != 0)
