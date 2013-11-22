@@ -74,8 +74,7 @@ int main(int argc, char *argv[])
     INIT_POS = cur_pos;
 
     //lancement de l'analyse lexico-syntaxique
-    if(analyse_syntax())
-        exit(EXIT_FAILURE);
+    analyse_syntax();
 
     exit(EXIT_SUCCESS);
 }

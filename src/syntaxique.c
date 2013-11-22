@@ -7,9 +7,13 @@
 //-------------------------------------------------------
 #include "syntaxique.h"
 
+// token venant de l'analyseur lexical
 char * token;
 
-int askForNext()
+// la première procédure
+procedure *firstp = NULL;
+
+void askForNext()
 {
     int size = next(&token);
     
@@ -18,37 +22,47 @@ int askForNext()
         askForNext();
     }
     else if (size < 0) {
-        fprintf(stderr, "Erreur : Fin du fichier inattendue.\n");
+        fprintf(stderr, "%s : Fin du fichier inattendue.\n", SYNTAX_ERROR);
         exit(EXIT_FAILURE);
     }
     else if (!size)
         printf("Analyse du token : %s\n", token);
 }
 
-int analyse_syntax()
+void analyse_syntax()
 {
+    // initialisation des variables nécessaires
     token = malloc(sizeof(char)*16);
+    err_msg = malloc(sizeof(char)*128);
+    procedure cur_proc;
 
-    while (cur_pos < INIT_POS + BUFLEN)
-        if(procedure())
-            return -1;
-
-    return 0;
+    while (cur_pos < INIT_POS + BUFLEN) {
+        if (firstp == NULL) {
+            //Initialisation de la liste de procédure
+            firstp = malloc(sizeof(procedure));
+            *firstp = (procedure){"", NULL, NULL};
+            cur_proc = firstp;
+        }
+        else {
+            cur_proc->next = malloc(sizeof(procedure));
+            cur_proc = cur_proc->next;
+            *cur_proc = (procedure){"", NULL, NULL};
+        }
+        proceduref(cur_proc);
+    }
 }
 
-int procedure()
+void proceduref(procedure *cur_proc)
 {
     askForNext();
 
     if (strcmp(token, "Procedure") != 0)
     {
-        fprintf(stderr, "Erreur : Le token attendu est : Procedure\n");
-        return -1;
+        fprintf(stderr, "%s : Le token attendu est \'Procedure\'\n", SYNTAX_ERROR);
+        exit(EXIT_FAILURE);
     }
 
-    askForNext();
-
-    identificator(1);
+    identificator(&cur_proc->id);
 
     declarations();
 
@@ -57,143 +71,111 @@ int procedure()
 
     if (strcmp(token, "Fin_Procedure") != 0)
     {
-        fprintf(stderr, "Erreur : Le token attendu est : Fin_Procedure\n");
-        return -1;
+        fprintf(stderr, "%s : Le token attendu est \'Fin_Procedure\'\n", SYNTAX_ERROR);
+        exit(EXIT_FAILURE);
     }
 
     askForNext();
 
-    identificator(1);
-
-    return 0;
+    identificator(NULL);
 }
 
-int declarations()
+void declarations()
 {
-    askForNext();
-
-    while (strcmp(token, "declare") == 0) {
+    do
+    {
         declaration();
         askForNext();
     }
-
-    
-
-    return 0;
+    while (strcmp(token, "declare") == 0)
 }
 
-int declaration()
+void declaration()
 {
-    askForNext();
-    
-    identificator(1);
+    // on vérifie l'identifiant
+    identificator(NULL);
 
+    // récupération du token
     askForNext();
-
     if (*token != ':') {
-        fprintf(stderr, "Erreur : Le token attendu est : :\n");
-        
-        return -1;
+        fprintf(stderr, "%s : Le token attendu est \':\'\n", SYNTAX_ERROR);
+        exit(EXIT_FAILURE);
     }
 
     type();
 
     askForNext();
-
     if (*token != ';') {
-        fprintf(stderr, "Erreur : Le token attendu est : ;\n");
-        
-        return -1;
+        fprintf(stderr, "%s : Le token attendu est \';\'\n", SYNTAX_ERROR);
+        exit(EXIT_FAILURE);
     }
-
-    return 0;
 }
 
 
-int type()
+void type()
 {
     askForNext();
-
-    if (strcmp(token, "entier") != 0 && strcmp(token, "réel") != 0) {
-        fprintf(stderr, "Erreur : Le type doit être : entier ou réel\n");
-        
-        return -1;
+    if (strcmp(token, "entier") && strcmp(token, "réel")) {
+        fprintf(stderr, "%s : Le type doit être \'entier\' ou \'réel\'\n", SYNTAX_ERROR);
+        exit(EXIT_FAILURE);
     }
 }
 
-int identificator(int message)
+int identificator(char **proc_id)
 {
-    if (strlen(token) > 8) {
-        if (message)
-            fprintf(stderr, "Erreur : Un identificateur doit contenir maximum 8 caractères.\n");
-        
-        return -1;
+    if (strlen(token) > BIGGEST_ID_LENGTH) {
+        fprintf(stderr, "%s : Un identificateur doit contenir maximum %s caractères.\n", SYNTAX_ERROR, BIGGEST_ID_LENGTH);
+        exit(EXIT_FAILURE);
     }
-    int position = 0;
-    int ascii;
 
-    ascii = (int)*token;
+    // Récupération du prochain token
+    askForNext();
+    if (proc_id != NULL && strcmp(token, *proc_id)) {
+        fprintf(stderr, "%s : L'identifcateur suivant le terminal \"Procedure\" doit coincider avec celui \
+                suivant le terminal \"Fin_Procedure\"\n", SYNTAX_ERROR);
+        exit(EXIT_FAILURE);
+    }
+    char *tok = token;
 
-    if (ascii < 65 || (ascii > 90 && ascii < 97) || ascii > 122) {
-        
-        if (message)
-            fprintf(stderr, "Erreur : Le premier caractère d'un identificateur doit être une lettre.\n");
-        
-        return -1;
+    // Vérification du caracètre commençant le token
+    if (*tok < 65 || (*tok > 90 && *tok < 97) || *tok > 122) {
+        fprintf(stderr, "%s : Le premier caractère d'un identificateur doit être une lettre.\n", SYNTAX_ERROR);
+        exit(EXIT_FAILURE);
     }
     
-    token++;
-    position++;
-
-    while (*token != '\0') {
-        
-        ascii =(int)*token;
-        if (ascii < 48 || (ascii > 57 && ascii < 65) || (ascii > 90 && ascii < 97) || ascii > 122) {
-            if (message)
-                fprintf(stderr, "Erreur : Un identificateur doit contenir seulement des lettres et des chiffres.\n");
-            
-            token -= position;
-            return -1;
+    while (*tok != '\0') {
+        tok++
+        if (*tok < 48 || (*tok > 57 && *tok < 65) || (*tok > 90 && *tok < 97) || *tok > 122) {
+            fprintf(stderr, "%s : Un identificateur doit contenir seulement des lettres et des chiffres.\n", SYNTAX_ERROR);
+            exit(EXIT_FAILURE);
         }
-
-        token++;
-        position++;
     }
-
-    token -= position;
     return 0;
 }
 
-int affectation_instructions()
+void affectation_instructions()
 {
-
     do {
-        if (*token == ';')
-            askForNext();
         affectation_instruction();
     } while (*token == ';');
-    return 0;
 }
 
-int affectation_instruction()
+void affectation_instruction()
 {
 
-    identificator(1);
+    identificator();
 
     askForNext();
 
     if (*token != '=') {
-        fprintf(stderr, "Erreur : Le token attendu est : =\n");
-       
-        return -1;
+        fprintf(stderr, "%s : Le token attendu est : =\n", SYNTAX_ERROR);
+        exit(EXIT_FAILURE);
     }
 
     arithmetic_expression();
-
-    return 0;
 }
 
-int arithmetic_expression()
+void arithmetic_expression()
 {
     do
     {
@@ -201,11 +183,9 @@ int arithmetic_expression()
         if (*token != '+' && *token != '-' && *token != ';' && strcmp(token,"Fin_Procedure") != 0 && *token != ')')
             askForNext();
     } while (*token == '+' || *token == '-');
-
-    return 0;
 }
 
-int term()
+void term()
 {
     do 
     {
@@ -213,50 +193,46 @@ int term()
         if (*token != '*' && *token != '/' && *token != '+' && *token != '-' && *token != ';' && strcmp(token,"Fin_Procedure") != 0 && *token != ')')
             askForNext();
     } while (*token == '*' || *token == '/');
-
-    return 0;
 }
 
-int factor()
+void factor()
 {
    askForNext();
 
-   if (!identificator(0)) {
-        return 0;
+   if (!identificator(NULL)) {
+        return;
    }
 
-   if (!number(0)) {
-        return 0;
+   if (!number()) {
+        return;
    }
 
    if (*token != '(') {
-       fprintf(stderr, "Erreur : Le token attendu est un nombre, une variable ou (\n");
-       
-       return -1;
+       fprintf(stderr, "%s : Le token attendu est un nombre, une variable ou \'(\'\n", SYNTAX_ERROR);
+       exit(EXIT_FAILURE);
    }
 
    arithmetic_expression();
 
 
    if (*token != ')') { 
-       fprintf(stderr, "Erreur : Le token attendu est : )\n");
+       fprintf(stderr, "%s : Le token attendu est : )\n", SYNTAX_ERROR);
 
-       return -1;
+       exit(EXIT_FAILURE);
    }
 
    askForNext();
-   return 0; 
 }
 
-int number(int message)
+int number()
 {
     
     float f;
 
     if (sscanf(token, "%f", &f) == 0){
         if (message)
-            fprintf(stderr, "Erreur : Le token attendu doit être un nombre.\n");
-        return -1;
+            fprintf(stderr, "%s : Le token attendu doit être un nombre.\n", SYNTAX_ERROR);
+        exit(EXIT_FAILURE);
     }
     return 0;
 }

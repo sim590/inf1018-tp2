@@ -11,18 +11,34 @@
 #define SYNTAXIQUE_4WEDD4T
 
 #include <analyseur.h>
+#include <lexical.h>
 
-int procedure();
-int declarations();
-int declaration();
-int affectation_instructions();
-int affectation_instruction();
-int variable(int);
-int type();
-int identificator(int);
-int arithmetic_expression();
-int term();
-int factor();
-int number(int);
+#define SYNTAX_ERROR "erreur de syntaxe"
+#define BIGGEST_ID_LENGTH 8
+
+typedef struct _declaration {
+    char var[8];
+    char type[6];
+    struct _declaration *next;
+} declaration;
+
+typedef struct _procedure {
+    char *id;
+    declaration *first_declare;
+    struct _procedure *next;
+} procedure;
+
+void proceduref();
+void declarations();
+void declaration();
+void affectation_instructions();
+void affectation_instruction();
+void variable();
+void type();
+int identificator(char **proc_id);
+void arithmetic_expression();
+void term();
+void factor();
+int number();
 
 #endif
