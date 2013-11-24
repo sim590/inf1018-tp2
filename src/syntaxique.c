@@ -10,9 +10,6 @@
 // token venant de l'analyseur lexical
 char * token;
 
-// la première procédure
-procedure *firstp = NULL;
-
 void askForNext()
 {
     int size = next(&token);
@@ -25,36 +22,35 @@ void askForNext()
         fprintf(stderr, "%s : Fin du fichier inattendue.\n", SYNTAX_ERROR);
         exit(EXIT_FAILURE);
     }
-    else if (!size)
-        printf("Analyse du token : %s\n", token);
 }
 
 void analyse_syntax()
 {
     // initialisation des variables nécessaires
     token = malloc(sizeof(char)*16);
-    err_msg = malloc(sizeof(char)*128);
-    procedure cur_proc;
+    proc *firstp = NULL; // la première procédure
+    proc *cur_proc; // la procédure en cours de construction
 
     while (cur_pos < INIT_POS + BUFLEN) {
         if (firstp == NULL) {
             //Initialisation de la liste de procédure
-            firstp = malloc(sizeof(procedure));
-            *firstp = (procedure){"", NULL, NULL};
+            firstp = malloc(sizeof(proc));
+            *firstp = (proc){"", NULL, NULL};
             cur_proc = firstp;
         }
         else {
-            cur_proc->next = malloc(sizeof(procedure));
+            cur_proc->next = malloc(sizeof(proc));
             cur_proc = cur_proc->next;
-            *cur_proc = (procedure){"", NULL, NULL};
+            *cur_proc = (proc){"", NULL, NULL};
         }
-        proceduref(cur_proc);
+        procedure(cur_proc);
     }
 }
 
-void proceduref(procedure *cur_proc)
+void procedure(proc *cur_proc)
 {
     askForNext();
+    printf("Analyse d'un bloc \'Procedure\', le token est:\n\'%s\'\n", token);
 
     if (strcmp(token, "Procedure") != 0)
     {
@@ -62,38 +58,56 @@ void proceduref(procedure *cur_proc)
         exit(EXIT_FAILURE);
     }
 
-    identificator(&cur_proc->id);
-
-    declarations();
-
+    identificator(&cur_proc->id, 0);
+    declarations(&cur_proc->first_declare, &cur_proc->last_declare);
     affectation_instructions();
 
-
-    if (strcmp(token, "Fin_Procedure") != 0)
+    if (strcmp(token, "Fin_Procedure"))
     {
         fprintf(stderr, "%s : Le token attendu est \'Fin_Procedure\'\n", SYNTAX_ERROR);
         exit(EXIT_FAILURE);
     }
 
-    askForNext();
-
-    identificator(NULL);
+    identificator(&cur_proc->id, 0);
 }
 
-void declarations()
+void declarations(declare **first, declare **last)
 {
-    do
-    {
-        declaration();
-        askForNext();
+    declare *cur_decl;
+
+    peek_next(&token); /*
+                        * ne fait que regarder le next sans déplacer cur_pos 
+                        */
+    while (!strcmp(token, "declare")) {
+        // la liste est vide
+        if (!*first) {
+            cur_decl = *first = *last = malloc(sizeof(declare));
+        }
+        else {
+            cur_decl = (*last)->next = malloc(sizeof(declare));
+            (*last) = cur_decl;
+        }
+        *cur_decl = (declare) {"", "", NULL};
+
+        askForNext(); // prend le token declare en déplaçant cur_pos cette fois-ci
+        declaration(cur_decl);
+        peek_next(&token);
     }
-    while (strcmp(token, "declare") == 0)
+
+    if (!first) {
+        fprintf(stderr, "%s : Au moins une (1) déclaration doit être faite.\n", SYNTAX_ERROR);
+        exit(EXIT_FAILURE);
+    }
 }
 
-void declaration()
+void declaration(declare *cur_decl)
 {
+    printf("Analyse d'une déclaration...\n");
+
     // on vérifie l'identifiant
-    identificator(NULL);
+    identificator(NULL, 0);
+    // stockage du nom de variable
+    strcpy(cur_decl->var, token);
 
     // récupération du token
     askForNext();
@@ -103,6 +117,8 @@ void declaration()
     }
 
     type();
+    //stockage du type de variable
+    strcpy(cur_decl->type, token);
 
     askForNext();
     if (*token != ';') {
@@ -121,34 +137,56 @@ void type()
     }
 }
 
-int identificator(char **proc_id)
+int identificator(char (*proc_id)[9], int maybe)
 {
+    // Récupération du prochain token
+    askForNext();
+    printf("Analyse d'un identificateur, le token est:\n\'%s\'\n", token);
+
     if (strlen(token) > BIGGEST_ID_LENGTH) {
-        fprintf(stderr, "%s : Un identificateur doit contenir maximum %s caractères.\n", SYNTAX_ERROR, BIGGEST_ID_LENGTH);
+        if (maybe) {
+            return 1;
+        }
+        fprintf(stderr, "%s : Un identificateur doit contenir maximum %i caractères.\n", SYNTAX_ERROR, BIGGEST_ID_LENGTH);
         exit(EXIT_FAILURE);
     }
 
-    // Récupération du prochain token
-    askForNext();
-    if (proc_id != NULL && strcmp(token, *proc_id)) {
-        fprintf(stderr, "%s : L'identifcateur suivant le terminal \"Procedure\" doit coincider avec celui \
-                suivant le terminal \"Fin_Procedure\"\n", SYNTAX_ERROR);
-        exit(EXIT_FAILURE);
+    // on a un id de procedure..
+    if (proc_id != NULL) {
+        // debut d'une procedure (Procedure <id>)
+        if (!strcmp(*proc_id, "")) {
+            strcpy(*proc_id, token);
+        }
+        // fin de procedure (Fin_procedure <id>)
+        else if (strcmp(token, *proc_id)) {
+            if (maybe) {
+                return 1;
+            }
+            fprintf(stderr, "%s : L'identifcateur suivant le terminal \"Procedure\" doit coincider avec celui \
+                    suivant le terminal \"Fin_Procedure\"\n", SYNTAX_ERROR);
+            exit(EXIT_FAILURE);
+        }
     }
     char *tok = token;
 
     // Vérification du caracètre commençant le token
     if (*tok < 65 || (*tok > 90 && *tok < 97) || *tok > 122) {
+        if (maybe) {
+            return 1;
+        }
         fprintf(stderr, "%s : Le premier caractère d'un identificateur doit être une lettre.\n", SYNTAX_ERROR);
         exit(EXIT_FAILURE);
     }
     
     while (*tok != '\0') {
-        tok++
         if (*tok < 48 || (*tok > 57 && *tok < 65) || (*tok > 90 && *tok < 97) || *tok > 122) {
+            if (maybe) {
+                return 1;
+            }
             fprintf(stderr, "%s : Un identificateur doit contenir seulement des lettres et des chiffres.\n", SYNTAX_ERROR);
             exit(EXIT_FAILURE);
         }
+        tok++;
     }
     return 0;
 }
@@ -157,81 +195,85 @@ void affectation_instructions()
 {
     do {
         affectation_instruction();
-    } while (*token == ';');
+    }
+    while (*token == ';');
 }
 
 void affectation_instruction()
 {
+    printf("Analyse d'une instruction d'affectation...\n");
 
-    identificator();
+    identificator(NULL, 0);
 
     askForNext();
-
     if (*token != '=') {
-        fprintf(stderr, "%s : Le token attendu est : =\n", SYNTAX_ERROR);
+        fprintf(stderr, "%s : Le token attendu est \'=\'\n", SYNTAX_ERROR);
         exit(EXIT_FAILURE);
     }
 
     arithmetic_expression();
+
+    if (*token != ';') {
+        fprintf(stderr, "%s : Le token attendu est \';\'\n", SYNTAX_ERROR);
+    }
 }
 
 void arithmetic_expression()
 {
-    do
-    {
+    printf("Analyse d'une expression arithmétique\n");
+    do {
         term();
-        if (*token != '+' && *token != '-' && *token != ';' && strcmp(token,"Fin_Procedure") != 0 && *token != ')')
-            askForNext();
     } while (*token == '+' || *token == '-');
 }
 
 void term()
 {
-    do 
-    {
+    printf("Analyse d'un terme...\n");
+
+    do {
         factor();
-        if (*token != '*' && *token != '/' && *token != '+' && *token != '-' && *token != ';' && strcmp(token,"Fin_Procedure") != 0 && *token != ')')
-            askForNext();
+        askForNext();
     } while (*token == '*' || *token == '/');
 }
 
 void factor()
 {
-   askForNext();
+    printf("Analyse d'un facteur...\n");
 
-   if (!identificator(NULL)) {
+    if (!identificator(NULL, 1)) {
         return;
-   }
+    }
 
-   if (!number()) {
+    rewind_pos(token);
+    if (!number(1)) {
         return;
-   }
+    }
 
-   if (*token != '(') {
+    if (*token != '(') {
        fprintf(stderr, "%s : Le token attendu est un nombre, une variable ou \'(\'\n", SYNTAX_ERROR);
        exit(EXIT_FAILURE);
-   }
+    }
 
-   arithmetic_expression();
+    arithmetic_expression();
 
-
-   if (*token != ')') { 
-       fprintf(stderr, "%s : Le token attendu est : )\n", SYNTAX_ERROR);
-
+    if (*token != ')') { 
+       fprintf(stderr, "%s : Le token attendu est \')\'\n", SYNTAX_ERROR);
        exit(EXIT_FAILURE);
-   }
-
-   askForNext();
+    }
 }
 
-int number()
+int number(int maybe)
 {
-    
     float f;
 
+    askForNext();
+
+    printf("Analyse d'un nombre, le token est :\n%s\n", token);
     if (sscanf(token, "%f", &f) == 0){
-        if (message)
-            fprintf(stderr, "%s : Le token attendu doit être un nombre.\n", SYNTAX_ERROR);
+        if (maybe) {
+            return 1;
+        }
+        fprintf(stderr, "%s : Le token attendu doit être un nombre.\n", SYNTAX_ERROR);
         exit(EXIT_FAILURE);
     }
     return 0;

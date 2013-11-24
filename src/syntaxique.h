@@ -17,28 +17,29 @@
 #define BIGGEST_ID_LENGTH 8
 
 typedef struct _declaration {
-    char var[8];
-    char type[6];
+    char var[9];
+    char type[7];
     struct _declaration *next;
-} declaration;
+} declare;
 
 typedef struct _procedure {
-    char *id;
-    declaration *first_declare;
+    char id[9];
+    declare *first_declare;
+    declare *last_declare;
     struct _procedure *next;
-} procedure;
+} proc;
 
-void proceduref();
-void declarations();
-void declaration();
+void procedure();
+void declarations(declare**, declare**);
+void declaration(declare*);
 void affectation_instructions();
 void affectation_instruction();
 void variable();
 void type();
-int identificator(char **proc_id);
+int identificator(char (*)[9], int);
 void arithmetic_expression();
 void term();
 void factor();
-int number();
+int number(int);
 
 #endif
