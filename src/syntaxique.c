@@ -8,6 +8,8 @@
 #include "syntaxique.h"
 
 char * token;
+declared_var * vars;
+int vars_count = 0;
 
 int askForNext()
 {
@@ -38,7 +40,7 @@ int procedure()
 
     askForNext();
 
-    identificator(1);
+    identificator(1,NULL);
 
     declarations();
 
@@ -53,7 +55,7 @@ int procedure()
 
     askForNext();
 
-    identificator(1);
+    identificator(1,NULL);
 
     return 0;
 }
@@ -76,7 +78,14 @@ int declaration()
 {
     askForNext();
     
-    identificator(1);
+    if (!identificator(1,NULL)) {
+        vars_count++;
+        vars = (declared_var*)realloc(vars, vars_count * sizeof(declared_var));
+        declared_var temp_var;
+        strcpy(temp_var.name,token);
+        strcpy(temp_var.type,token);
+        vars[vars_count - 1] = temp_var;
+    }
 
     askForNext();
 
@@ -86,7 +95,9 @@ int declaration()
         return -1;
     }
 
-    type();
+    if (!type()) {
+        strcpy(vars[vars_count - 1].type, token);
+    }
 
     askForNext();
 
@@ -111,7 +122,7 @@ int type()
     }
 }
 
-int identificator(int message)
+int identificator(int message, declared_var * match)
 {
     if (strlen(token) > 8) {
         if (message)
@@ -151,6 +162,17 @@ int identificator(int message)
     }
 
     token -= position;
+
+    if (match != NULL) {
+        int i;
+        for (i = 0; i < vars_count;i++) {
+            if (!strcmp(vars[i].name,token)) {
+                *match = vars[i];
+                break;
+            }
+        }
+    }
+
     return 0;
 }
 
@@ -167,8 +189,10 @@ int affectation_instructions()
 
 int affectation_instruction()
 {
-
-    identificator(1);
+    declared_var receiving_var;
+    strcpy(receiving_var.name, "");
+    strcpy(receiving_var.type, "");
+    identificator(1, &receiving_var);
 
     askForNext();
 
@@ -177,17 +201,21 @@ int affectation_instruction()
        
         return -1;
     }
+    int isInteger = 1;
 
-    arithmetic_expression();
+    arithmetic_expression(&isInteger);
 
+    if (!isInteger && !strcmp(receiving_var.type, "entier")) {
+        fprintf(stderr,"Erreur : Impossible d'assigner un réel à une variable de type entier.\n");
+    }
     return 0;
 }
 
-int arithmetic_expression()
+int arithmetic_expression(int * isInteger)
 {
     do
     {
-        term();
+        term(isInteger);
         if (*token != '+' && *token != '-' && *token != ';' && strcmp(token,"Fin_Procedure") != 0 && *token != ')')
             askForNext();
     } while (*token == '+' || *token == '-');
@@ -195,11 +223,11 @@ int arithmetic_expression()
     return 0;
 }
 
-int term()
+int term(int * isInteger)
 {
     do 
     {
-        factor();
+        factor(isInteger);
         if (*token != '*' && *token != '/' && *token != '+' && *token != '-' && *token != ';' && strcmp(token,"Fin_Procedure") != 0 && *token != ')')
             askForNext();
     } while (*token == '*' || *token == '/');
@@ -207,15 +235,23 @@ int term()
     return 0;
 }
 
-int factor()
+int factor(int* isInteger)
 {
    askForNext();
-
-   if (!identificator(0)) {
+   declared_var factor_var;
+   if (!identificator(0,&factor_var)) {
+        if (!strcmp(factor_var.name, "")) {
+            fprintf(stderr, "Erreur : La variable %s n'est pas déclarée.\n", token);
+            return -1;
+        }
+        
+        if (*isInteger && !strcmp(factor_var.name, "réel")) {
+            *isInteger = 0;
+        }
         return 0;
    }
 
-   if (!number(0)) {
+   if (!number(0,isInteger)) {
         return 0;
    }
 
@@ -225,7 +261,7 @@ int factor()
        return -1;
    }
 
-   arithmetic_expression();
+   arithmetic_expression(isInteger);
 
 
    if (*token != ')') { 
@@ -238,15 +274,18 @@ int factor()
    return 0; 
 }
 
-int number(int message)
+int number(int message, int * isInteger)
 {
-    
-    float f;
+    char* endptr;
+    double value = strtod(token, &endptr);
 
-    if (sscanf(token, "%f", &f) == 0){
+    if (*endptr != 0){
         if (message)
             fprintf(stderr, "Erreur : Le token attendu doit être un nombre.\n");
         return -1;
+    }
+    if (atoi(token) != value && *isInteger) {
+        *isInteger = 0;
     }
     return 0;
 }

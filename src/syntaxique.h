@@ -12,17 +12,21 @@
 
 #include <analyseur.h>
 
+typedef struct declared_var {
+    char name[9];
+    char type[7];
+} declared_var;
+
 int procedure();
 int declarations();
 int declaration();
 int affectation_instructions();
 int affectation_instruction();
-int variable(int);
 int type();
-int identificator(int);
-int arithmetic_expression();
-int term();
-int factor();
-int number(int);
+int identificator(int,declared_var*);
+int arithmetic_expression(int*);
+int term(int*);
+int factor(int*);
+int number(int,int*);
 
 #endif

@@ -11,7 +11,7 @@ DEBUG=-g
 
 all: analyseur.o syntaxique.o lexical.o
 	mkdir -p $(BINDIR)
-	gcc -o $(BINDIR)/inf1018tp2 analyseur.o syntaxique.o lexical.o
+	gcc -o $(BINDIR)/inf1018tp2 analyseur.o syntaxique.o lexical.o -lm
 analyseur.o: analyseur.c
 	gcc -I. $(DEBUG) -c analyseur.c
 syntaxique.o: syntaxique.c syntaxique.h
