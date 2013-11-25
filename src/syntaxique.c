@@ -31,7 +31,7 @@ void analyse_syntax()
     proc *firstp = NULL; // la première procédure
     proc *cur_proc; // la procédure en cours de construction
 
-    while (cur_pos < INIT_POS + BUFLEN) {
+    do {
         if (firstp == NULL) {
             //Initialisation de la liste de procédure
             firstp = malloc(sizeof(proc));
@@ -44,7 +44,9 @@ void analyse_syntax()
             *cur_proc = (proc){"", NULL, NULL};
         }
         procedure(cur_proc);
+        peek_next(&token);
     }
+    while (token != NULL);
 }
 
 void procedure(proc *cur_proc)

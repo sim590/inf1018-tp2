@@ -7,8 +7,12 @@
 //-------------------------------------------------------
 #include "lexical.h"
 
-const char delims_n_token[] =  {'=', '+', '-', '*', '/', ':', ';', '(', ')', '\0'},
-    all_delims[] =  {' ', '\n', '\t', '=', '+', '-', '*', '/', ':', ';', '(', ')', '\0'}; // On doit terminer le array par un \0 pour  
+static const lexicons lexicon = {
+    /*lexicon.all_delims*/ {' ', '\n', '\t', '=', '+', '-', '*', '/', ':', ';', '(', ')', '\0'},
+    /*lexicon.delims_n_tokenss*/ {'=', '+', '-', '*', '/', ':', ';', '(', ')', '\0'},
+    /*reserved_words*/ {"Procedure\0", "Fin_Procedure\0", "declare\0", "entier\0", "réel\0"}
+};
+
 
 int next(char **token)
 {
@@ -22,19 +26,19 @@ int next(char **token)
 
     char *tok = NULL;
 
-    while (in(all_delims, MAIN_BUFFER[cur_pos-INIT_POS])) { //*((char*)((long)MAIN_BUFFER+(long)cur_pos-INIT_POS)) 
+    while (in(lexicon.all_delims, MAIN_BUFFER[cur_pos-INIT_POS])) {
 
         cur_pos++;
         
         // si le token est un délimiteur
-        if (in(delims_n_token, MAIN_BUFFER[cur_pos-INIT_POS-1])) {
+        if (in(lexicon.delims_n_tokens, MAIN_BUFFER[cur_pos-INIT_POS-1])) {
             sprintf(*token, "%c\0", MAIN_BUFFER[cur_pos-INIT_POS-1]);
             return 0;
         }
     }
 
     // on récupère le token
-    tok = strtok(cur_pos, all_delims);
+    tok = strtok(cur_pos, lexicon.all_delims);
 
     // plus de token à analyser
     if (!tok) {
@@ -55,11 +59,35 @@ int next(char **token)
     return 0;
 }
 
+void peek_next(char **token)
+{
+    char *tok = *token;
+    next(token);
+    rewind_pos(tok);
+}
+
+void rewind_pos(char *token)
+{
+    cur_pos[0] = MAIN_BUFFER[cur_pos-INIT_POS];
+    cur_pos-=strlen(token)+1;
+}
+
 int in(const char delims[], char token)
 {
     int i;
     for (i = 0; i < strlen(delims); i++) {
         if (token == delims[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int is_reserved(char *token)
+{
+    int i;
+    for (i = 0; i < NUMBER_RESERVED_WORDS; i++) {
+        if (!strcmp(lexicon.reserved_words[i], token)) {
             return 1;
         }
     }

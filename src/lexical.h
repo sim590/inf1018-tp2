@@ -11,9 +11,15 @@
 
 #include <analyseur.h>
 
-const char all_delims[13], delims_n_token[10];
+#define NUMBER_RESERVED_WORDS 5
+
 char *cur_pos, *INIT_POS;
 
+typedef struct _lexicon {
+    char all_delims[13];
+    char delims_n_tokens[10];
+    char reserved_words[NUMBER_RESERVED_WORDS][16];
+} lexicons;
 
 //----------------------------------------
 // next()
@@ -27,7 +33,9 @@ char *cur_pos, *INIT_POS;
 // traiter.
 //----------------------------------------
 int next(char**);
-
+void peek_next(char**);
+void rewind_pos(char *);
+int is_reserved(char *);
 int in(const char[], char);
 
 #endif /* end of include guard: LEXICAL_4UGTM7YE */
