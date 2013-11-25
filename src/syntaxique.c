@@ -215,7 +215,7 @@ void affectation_instruction()
 
     arithmetic_expression();
 
-    if (*token != ';') {
+    if (*token != ';' && strcmp(token, "Fin_Procedure")) {
         fprintf(stderr, "%s : Le token attendu est \';\'\n", SYNTAX_ERROR);
     }
 }
