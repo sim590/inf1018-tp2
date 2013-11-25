@@ -256,7 +256,7 @@ void factor(char *affecting_type)
             fprintf(stderr, "%s : La variable doit être préalablement déclarée\n", SYNTAX_ERROR);
             exit(EXIT_FAILURE);
         }
-        if (strcmp(affecting_type, "entier") && !strcmp(this_var_decl->type, affecting_type)) {
+        if (!strcmp(affecting_type, "entier") && strcmp(this_var_decl->type, "entier")) {
             fprintf(stderr, "%s : Une variable entière ne peut se faire attribuer un résultat réel.\n", SYNTAX_ERROR);
             exit(EXIT_FAILURE);
         }
