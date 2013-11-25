@@ -1,0 +1,10 @@
+
+Procedure proc1
+declare var#1 : entier ;
+declare var2:réel;
+
+var#1 = 3;
+var2 = 6.5;
+var2 = var#1 + var2 * (var#1 / 3)
+
+Fin_Procedure proc1
