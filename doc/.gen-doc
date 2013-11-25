@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for file in *.1;
+do
+	zcat $file | groff -K utf8 -mandoc -Tpdf > "${file%.}".pdf
+done
