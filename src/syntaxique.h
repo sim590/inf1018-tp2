@@ -30,16 +30,18 @@ typedef struct _procedure {
 } proc;
 
 void procedure();
-void declarations(declare**, declare**);
+void declarations();
 void declaration(declare*);
 void affectation_instructions();
 void affectation_instruction();
 void variable();
 void type();
-int identificator(char (*)[9], int);
+int identificator(int, int);
 void arithmetic_expression();
 void term();
 void factor();
 int number(int);
+
+declare* find_decl(char*);
 
 #endif

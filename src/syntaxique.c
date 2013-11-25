@@ -7,6 +7,9 @@
 //-------------------------------------------------------
 #include "syntaxique.h"
 
+proc *firstp = NULL; // la première procédure
+proc *cur_proc = NULL; // la procédure en cours de construction
+
 // token venant de l'analyseur lexical
 char * token;
 
@@ -28,8 +31,6 @@ void analyse_syntax()
 {
     // initialisation des variables nécessaires
     token = malloc(sizeof(char)*16);
-    proc *firstp = NULL; // la première procédure
-    proc *cur_proc; // la procédure en cours de construction
 
     do {
         if (firstp == NULL) {
@@ -43,13 +44,13 @@ void analyse_syntax()
             cur_proc = cur_proc->next;
             *cur_proc = (proc){"", NULL, NULL};
         }
-        procedure(cur_proc);
+        procedure();
         peek_next(&token);
     }
     while (token != NULL);
 }
 
-void procedure(proc *cur_proc)
+void procedure()
 {
     askForNext();
     printf("Analyse d'un bloc \'Procedure\', le token est:\n\'%s\'\n", token);
@@ -60,8 +61,8 @@ void procedure(proc *cur_proc)
         exit(EXIT_FAILURE);
     }
 
-    identificator(&cur_proc->id, 0);
-    declarations(&cur_proc->first_declare, &cur_proc->last_declare);
+    identificator(1,0);
+    declarations();
     affectation_instructions();
 
     if (strcmp(token, "Fin_Procedure"))
@@ -70,10 +71,10 @@ void procedure(proc *cur_proc)
         exit(EXIT_FAILURE);
     }
 
-    identificator(&cur_proc->id, 0);
+    identificator(1, 0);
 }
 
-void declarations(declare **first, declare **last)
+void declarations()
 {
     declare *cur_decl;
 
@@ -82,12 +83,12 @@ void declarations(declare **first, declare **last)
                         */
     while (!strcmp(token, "declare")) {
         // la liste est vide
-        if (!*first) {
-            cur_decl = *first = *last = malloc(sizeof(declare));
+        if (!cur_proc->first_declare) {
+            cur_decl = cur_proc->first_declare = cur_proc->last_declare = malloc(sizeof(declare));
         }
         else {
-            cur_decl = (*last)->next = malloc(sizeof(declare));
-            (*last) = cur_decl;
+            cur_decl = cur_proc->last_declare->next = malloc(sizeof(declare));
+            cur_proc->last_declare = cur_decl;
         }
         *cur_decl = (declare) {"", "", NULL};
 
@@ -96,7 +97,7 @@ void declarations(declare **first, declare **last)
         peek_next(&token);
     }
 
-    if (!first) {
+    if (!cur_proc->first_declare) {
         fprintf(stderr, "%s : Au moins une (1) déclaration doit être faite.\n", SYNTAX_ERROR);
         exit(EXIT_FAILURE);
     }
@@ -107,7 +108,7 @@ void declaration(declare *cur_decl)
     printf("Analyse d'une déclaration...\n");
 
     // on vérifie l'identifiant
-    identificator(NULL, 0);
+    identificator(0, 0);
     // stockage du nom de variable
     strcpy(cur_decl->var, token);
 
@@ -139,7 +140,7 @@ void type()
     }
 }
 
-int identificator(char (*proc_id)[9], int maybe)
+int identificator(int is_proc_id, int maybe)
 {
     // Récupération du prochain token
     askForNext();
@@ -152,15 +153,19 @@ int identificator(char (*proc_id)[9], int maybe)
         fprintf(stderr, "%s : Un identificateur doit contenir maximum %i caractères.\n", SYNTAX_ERROR, BIGGEST_ID_LENGTH);
         exit(EXIT_FAILURE);
     }
+    if (is_reserved(token)) {
+        fprintf(stderr, "Un identificateur doit être différent des mots réservés du langage.\n");
+        exit(EXIT_FAILURE);
+    }
 
     // on a un id de procedure..
-    if (proc_id != NULL) {
+    if (is_proc_id) {
         // debut d'une procedure (Procedure <id>)
-        if (!strcmp(*proc_id, "")) {
-            strcpy(*proc_id, token);
+        if (!strcmp(cur_proc->id, "")) {
+            strcpy(cur_proc->id, token);
         }
         // fin de procedure (Fin_procedure <id>)
-        else if (strcmp(token, *proc_id)) {
+        else if (strcmp(token, cur_proc->id)) {
             if (maybe) {
                 return 1;
             }
@@ -203,9 +208,15 @@ void affectation_instructions()
 
 void affectation_instruction()
 {
+    declare *affecting_var_decl;
     printf("Analyse d'une instruction d'affectation...\n");
 
-    identificator(NULL, 0);
+    identificator(0, 0);
+    affecting_var_decl = find_decl(token);
+    if (!affecting_var_decl) {
+        fprintf(stderr, "%s : La variable doit être préalablement déclarée\n", SYNTAX_ERROR);
+        exit(EXIT_FAILURE);
+    }
 
     askForNext();
     if (*token != '=') {
@@ -213,36 +224,42 @@ void affectation_instruction()
         exit(EXIT_FAILURE);
     }
 
-    arithmetic_expression();
-
-    if (*token != ';') {
-        fprintf(stderr, "%s : Le token attendu est \';\'\n", SYNTAX_ERROR);
-    }
+    arithmetic_expression(affecting_var_decl->type);
 }
 
-void arithmetic_expression()
+void arithmetic_expression(char *affecting_type)
 {
     printf("Analyse d'une expression arithmétique\n");
     do {
-        term();
+        term(affecting_type);
     } while (*token == '+' || *token == '-');
 }
 
-void term()
+void term(char *affecting_type)
 {
     printf("Analyse d'un terme...\n");
 
     do {
-        factor();
+        factor(affecting_type);
         askForNext();
     } while (*token == '*' || *token == '/');
 }
 
-void factor()
+void factor(char *affecting_type)
 {
     printf("Analyse d'un facteur...\n");
 
-    if (!identificator(NULL, 1)) {
+    if (!identificator(0, 1)) {
+        declare *this_var_decl = find_decl(token);
+
+        if (!this_var_decl) {
+            fprintf(stderr, "%s : La variable doit être préalablement déclarée\n", SYNTAX_ERROR);
+            exit(EXIT_FAILURE);
+        }
+        if (strcmp(affecting_type, "entier") && !strcmp(this_var_decl->type, affecting_type)) {
+            fprintf(stderr, "%s : Une variable entière ne peut se faire attribuer un résultat réel.\n", SYNTAX_ERROR);
+            exit(EXIT_FAILURE);
+        }
         return;
     }
 
@@ -256,7 +273,7 @@ void factor()
        exit(EXIT_FAILURE);
     }
 
-    arithmetic_expression();
+    arithmetic_expression(affecting_type);
 
     if (*token != ')') { 
        fprintf(stderr, "%s : Le token attendu est \')\'\n", SYNTAX_ERROR);
@@ -279,4 +296,22 @@ int number(int maybe)
         exit(EXIT_FAILURE);
     }
     return 0;
+}
+
+declare* find_decl(char *var)
+{
+    declare* cur, *first;
+    cur = first = cur_proc->first_declare;
+
+    if (!first) {
+        return NULL;
+    }
+    
+    while (cur) {
+        if (!strcmp(cur->var, var)) {
+            return cur;
+        }
+        cur = cur->next;
+    }
+    return NULL;
 }
